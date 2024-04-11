@@ -60,7 +60,7 @@ func (m *Storage) NewUser(login string, password string) error {
 
 func (m *Storage) GetUser(login string) (string, error) {
 	var value sql.NullString
-	rows := m.DB.QueryRowContext(m.Ctx, "SELECT login FROM users WHERE key=$1", login)
+	rows := m.DB.QueryRowContext(m.Ctx, "SELECT id FROM users WHERE login=$1", login)
 	err := rows.Scan(&value)
 	if err != nil {
 		return "", fmt.Errorf("error select %q", err)
