@@ -21,23 +21,14 @@ func Register(m storagedb.Storage) http.HandlerFunc {
 			res.WriteHeader(http.StatusBadRequest)
 			return
 		}
-		// value, _ := m.GetUser(user.Login)
-		// if value != "" {
-		// 	res.WriteHeader(http.StatusConflict)
-		// 	return
-		// }
-
-		// err := m.NewUser(user.Login, user.Password)
-		// if err != nil {
-		// 	res.WriteHeader(http.StatusInternalServerError)
-		// 	return
-		// }
-		resp := model.User{
-			Login:    user.Login,
-			Password: user.Password,
+		value, _ := m.GetUser(user.Login)
+		if value != "" {
+			res.WriteHeader(http.StatusConflict)
+			return
 		}
-		enc := json.NewEncoder(res)
-		if err := enc.Encode(resp); err != nil {
+		err := m.NewUser(user.Login, user.Password)
+		if err != nil {
+			res.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 		res.WriteHeader(http.StatusOK)
