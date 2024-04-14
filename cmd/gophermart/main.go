@@ -10,7 +10,7 @@ import (
 	_ "github.com/jackc/pgx/v5/stdlib"
 
 	"github.com/andromaril/gophermmart/internal/flag"
-	login "github.com/andromaril/gophermmart/internal/handler"
+	h "github.com/andromaril/gophermmart/internal/handler"
 	storagedb "github.com/andromaril/gophermmart/internal/storage"
 )
 
@@ -30,7 +30,8 @@ func main() {
 	//defer db.Close()
 	//}
 	r := chi.NewRouter()
-	r.Post("/api/user/register", login.Register(newdb))
+	r.Post("/api/user/register",h.Register(newdb))
+	r.Post("/api/user/login",h.Login(newdb))
 	if err := http.ListenAndServe(flag.FlagRunAddr, r); err != nil {
 		panic(err)
 

@@ -39,7 +39,7 @@ func (m *Storage) Bootstrap(ctx context.Context) error {
 		CREATE TABLE IF NOT EXISTS users (
 			id SERIAL PRIMARY KEY,
 			login varchar(100) UNIQUE NOT NULL, 
-			password varchar(100) UNIQUE NOT NULL
+			password varchar(200) NOT NULL
 		);
 	`)
 	if err != nil {
@@ -70,3 +70,17 @@ func (m *Storage) GetUser(login string) (string, error) {
 	}
 	return value.String, nil
 }
+
+func (m *Storage) GetUserPassword(login string) (string, error) {
+	var value sql.NullString
+	rows := m.DB.QueryRowContext(m.Ctx, "SELECT password FROM users WHERE login=$1", login)
+	err := rows.Scan(&value)
+	if err != nil {
+		return "", fmt.Errorf("error select %q", err)
+	}
+	if !value.Valid {
+		return "", fmt.Errorf("invalid login %q", err)
+	}
+	return value.String, nil
+}
+

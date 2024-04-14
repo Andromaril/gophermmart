@@ -11,7 +11,7 @@ import (
 	"github.com/andromaril/gophermmart/internal/verification"
 )
 
-func Login(m storagedb.Storage) http.HandlerFunc {
+func Register(m storagedb.Storage) http.HandlerFunc {
 	return func(res http.ResponseWriter, req *http.Request) {
 		var user model.User
 		res.Header().Set("Content-Type", "application/json")
@@ -26,9 +26,14 @@ func Login(m storagedb.Storage) http.HandlerFunc {
 		}
 		hash := md5.Sum([]byte(user.Password))
 		hashedPass := hex.EncodeToString(hash[:])
-		value, _ := m.GetUserPassword(user.Login)
-		if value != hashedPass {
-			res.WriteHeader(http.StatusUnauthorized)
+		value, _ := m.GetUser(user.Login)
+		if value != "" {
+			res.WriteHeader(http.StatusConflict)
+			return
+		}
+		err := m.NewUser(user.Login, hashedPass)
+		if err != nil {
+			res.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 		token, _ := verification.BuildJWTString()
