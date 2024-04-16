@@ -16,6 +16,7 @@ func NewOrder(m storagedb.Storage) http.HandlerFunc {
 		cookie, _ := req.Cookie("Login")
 		requestData, err1 := io.ReadAll(req.Body)
 		if err1 != nil {
+			//res.Write([]byte(requestData))
 			res.WriteHeader(http.StatusInternalServerError)
 			return
 		}
@@ -25,7 +26,7 @@ func NewOrder(m storagedb.Storage) http.HandlerFunc {
 		if validnumer {
 			orderexist, _ := m.GetOrderUser(cookie.Value, number2)
 			if orderexist != 0 {
-				res.Write([]byte(cookie.Value))
+				//res.Write([]byte(cookie.Value))
 				res.WriteHeader(http.StatusOK)
 				return
 			}
@@ -36,6 +37,8 @@ func NewOrder(m storagedb.Storage) http.HandlerFunc {
 			}
 			err := m.NewOrder(cookie.Value, number2)
 			if err != nil {
+				// f := fmt.Sprint("%q", err)
+				// res.Write([]byte(f))
 				res.WriteHeader(http.StatusInternalServerError)
 				return
 			}
