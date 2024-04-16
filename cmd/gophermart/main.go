@@ -11,6 +11,7 @@ import (
 
 	"github.com/andromaril/gophermmart/internal/flag"
 	h "github.com/andromaril/gophermmart/internal/handler"
+	"github.com/andromaril/gophermmart/internal/middleware"
 	storagedb "github.com/andromaril/gophermmart/internal/storage"
 )
 
@@ -30,8 +31,10 @@ func main() {
 	//defer db.Close()
 	//}
 	r := chi.NewRouter()
-	r.Post("/api/user/register",h.Register(newdb))
-	r.Post("/api/user/login",h.Login(newdb))
+	//r.Use(middleware.AuthMiddlewareContext)
+	r.Post("/api/user/register", h.Register(newdb))
+	r.Post("/api/user/login", h.Login(newdb))
+	r.With(middleware.AuthMiddleware).Post("/api/user/orders", h.NewOrder(newdb))
 	if err := http.ListenAndServe(flag.FlagRunAddr, r); err != nil {
 		panic(err)
 

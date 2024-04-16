@@ -35,9 +35,18 @@ func Login(m storagedb.Storage) http.HandlerFunc {
 		cookie := &http.Cookie{
 			Name:   "Token",
 			Value:  token,
+			Path:   "/",
 			MaxAge: 300,
 		}
+		cookie2 := &http.Cookie{
+			Name:   "Login",
+			Value:  user.Login,
+			Path:   "/",
+			MaxAge: 300,
+		}
+		res.Header().Add("Authorization", user.Login)
 		http.SetCookie(res, cookie)
-		res.WriteHeader(http.StatusOK)
+		http.SetCookie(res, cookie2)
+		//res.WriteHeader(http.StatusOK)
 	}
 }
