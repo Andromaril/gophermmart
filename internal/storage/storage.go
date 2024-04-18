@@ -58,5 +58,16 @@ func (m *Storage) Bootstrap(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("fatal start a transaction %q", err)
 	}
+	_, err = tx.ExecContext(m.Ctx, `
+		CREATE TABLE IF NOT EXISTS balances (
+			id SERIAL PRIMARY KEY,
+			login varchar(100) UNIQUE NOT NULL, 
+			current DOUBLE PRECISION,
+			withdrawn DOUBLE PRECISION
+		);
+	`)
+	if err != nil {
+		return fmt.Errorf("fatal start a transaction %q", err)
+	}
 	return tx.Commit()
 }
