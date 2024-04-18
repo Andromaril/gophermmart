@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	storagedb "github.com/andromaril/gophermmart/internal/storage"
@@ -13,8 +14,8 @@ func GetBalance(m storagedb.Storage) http.HandlerFunc {
 		res.Header().Set("Content-Type", "application/json")
 		result, err := m.GetBalance(cookie.Value)
 		if err != nil {
-			// f := fmt.Sprint("%q", err)
-			// res.Write([]byte(f))
+			f := fmt.Sprint("%q", err)
+			res.Write([]byte(f))
 			res.WriteHeader(http.StatusInternalServerError)
 			return
 		}
