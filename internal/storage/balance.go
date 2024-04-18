@@ -18,10 +18,11 @@ func (m *Storage) GetBalance(login string) (model.Balance, error) {
 
 	// обязательно закрываем перед возвратом функции
 	defer rows.Close()
-	rows.Next()
-	err = rows.Scan(&result.Current, &result.Withdrawn)
-	if err != nil {
-		return model.Balance{}, fmt.Errorf("invalid login %q", err)
+	for rows.Next() {
+		err = rows.Scan(&result.Current, &result.Withdrawn)
+		if err != nil {
+			return model.Balance{}, fmt.Errorf("invalid login %q", err)
+		}
 	}
 	return result, nil
 }
