@@ -2,6 +2,7 @@ package storagedb
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/andromaril/gophermmart/internal/model"
 )
@@ -11,6 +12,7 @@ func (m *Storage) GetBalance(login string) (model.Balance, error) {
 	rows, err := m.DB.QueryContext(m.Ctx, "SELECT current, withdrawn FROM balances WHERE login=$1", login)
 	//err := rows.Scan(&value)
 	if err != nil {
+		log.Println("This is a log message!")
 		return model.Balance{}, fmt.Errorf("invalid login %q", err)
 	}
 
