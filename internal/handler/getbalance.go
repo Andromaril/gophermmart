@@ -15,7 +15,7 @@ func GetBalance(m storagedb.Storage) http.HandlerFunc {
 		if err != nil {
 			// f := fmt.Sprint("%q", err)
 			// res.Write([]byte(f))
-			res.WriteHeader(http.StatusNotFound)
+			res.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 		body, err1 := json.Marshal(result)
