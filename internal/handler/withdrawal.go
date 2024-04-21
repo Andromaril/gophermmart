@@ -2,12 +2,12 @@ package handler
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 	"strconv"
 
 	"github.com/andromaril/gophermmart/internal/model"
 	storagedb "github.com/andromaril/gophermmart/internal/storage"
+	"github.com/theplant/luhn"
 )
 
 func GetWithdrawal(m storagedb.Storage) http.HandlerFunc {
@@ -47,23 +47,28 @@ func NewWithdrawal(m storagedb.Storage) http.HandlerFunc {
 		}
 		cookie, _ := req.Cookie("Login")
 		number, _ := strconv.Atoi(r.Order)
-		_, err1 := m.GetOrderUser(cookie.Value, int(number))
-		if err1 != nil {
-			//res.Write([]byte(cookie.Value))
-			log.Printf("%q", err1)
-			res.WriteHeader(http.StatusUnprocessableEntity)
-			return
-		}
-		err := m.UpdateBalance(cookie.Value, r)
-		if err != nil {
-			// f := fmt.Sprint("%q", err)
-			// res.Write([]byte(f))
-			if err == storagedb.ErrNotBalance {
-				res.WriteHeader(http.StatusPaymentRequired)
+		validnumer := luhn.Valid(number)
+		// _, err1 := m.GetOrderUser(cookie.Value, int(number))
+		// if err1 != nil {
+		// 	//res.Write([]byte(cookie.Value))
+		// 	log.Printf("%q", err1)
+		// 	res.WriteHeader(http.StatusUnprocessableEntity)
+		// 	return
+		// }
+		if validnumer {
+			err := m.UpdateBalance(cookie.Value, r)
+			if err != nil {
+				// f := fmt.Sprint("%q", err)
+				// res.Write([]byte(f))
+				if err == storagedb.ErrNotBalance {
+					res.WriteHeader(http.StatusPaymentRequired)
+					return
+				}
+				res.WriteHeader(http.StatusInternalServerError)
 				return
 			}
-			res.WriteHeader(http.StatusInternalServerError)
-			return
+		} else {
+			res.WriteHeader(http.StatusUnprocessableEntity)
 		}
 		res.WriteHeader(http.StatusOK)
 	}
