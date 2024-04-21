@@ -61,7 +61,7 @@ func (m *Storage) Bootstrap(ctx context.Context) error {
 	_, err = tx.ExecContext(m.Ctx, `
 		CREATE TABLE IF NOT EXISTS balances (
 			id SERIAL PRIMARY KEY,
-			login varchar(100) NOT NULL references users(id), 
+			login varchar(100) NOT NULL references users(login), 
 			current DOUBLE PRECISION,
 			withdrawn DOUBLE PRECISION
 		);
