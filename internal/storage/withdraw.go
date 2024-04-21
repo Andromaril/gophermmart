@@ -73,7 +73,7 @@ func (m *Storage) UpdateBalance(login string, withdrawal model.Withdrawn) error 
 			return fmt.Errorf("error insert %q", err)
 		}
 		_, err2 := m.DB.ExecContext(m.Ctx, `
-		INSERT INTO balances (login, current, withdrawn) values ($1)`, login, balance, 0)
+		INSERT INTO balances (login, current, withdrawn) values ($1, $2, $3)`, login, balance, 0)
 		if err != nil {
 			return fmt.Errorf("error insert %q", err2)
 		}
