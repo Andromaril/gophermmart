@@ -90,3 +90,17 @@ func (m *Storage) getOrderId(number int) (int, error) {
 
 	return int(value.Int64), nil
 }
+
+func (m *Storage) GetAccural(number int) (float64, error) {
+	var value sql.NullFloat64
+	row := m.DB.QueryRowContext(m.Ctx, "SELECT accrual FROM orders WHERE number = $1", number)
+	err := row.Scan(&value)
+	if err != nil {
+		return 0, fmt.Errorf("error select %q", err)
+	}
+	if !value.Valid {
+		return 0, fmt.Errorf("invalid login %q", err)
+	}
+
+	return value.Float64, nil
+}
