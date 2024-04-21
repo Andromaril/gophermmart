@@ -47,8 +47,8 @@ func (m *Storage) UpdateBalance(login string, withdrawal model.Withdrawn) error 
 	if err1 != nil {
 		return fmt.Errorf("error insert %q", err1)
 	}
-	user, _ := m.getUserId(login)
-	if user != 0 {
+	user := m.getUserId(login)
+	if user != 0 && user != 1 {
 		balance, err := m.GetBalance(login)
 		if err != nil {
 			return fmt.Errorf("error balance %q", err)
@@ -88,16 +88,16 @@ func (m *Storage) UpdateBalance(login string, withdrawal model.Withdrawn) error 
 	return nil
 }
 
-func (m *Storage) getUserId(login string) (int, error) {
+func (m *Storage) getUserId(login string) int {
 	var value sql.NullInt64
 	row := m.DB.QueryRowContext(m.Ctx, "SELECT id FROM balances WHERE login = $1", login)
 	err := row.Scan(&value)
 	if err != nil {
-		return 0, fmt.Errorf("error select %q", err)
+		return 0
 	}
 	if !value.Valid {
-		return 0, fmt.Errorf("invalid login %q", err)
+		return 1
 	}
 
-	return int(value.Int64), nil
+	return int(value.Int64)
 }
