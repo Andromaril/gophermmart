@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -46,9 +47,10 @@ func NewWithdrawal(m storagedb.Storage) http.HandlerFunc {
 		}
 		cookie, _ := req.Cookie("Login")
 		number, _ := strconv.Atoi(r.Order)
-		orderexist, _ := m.GetOrderUser(cookie.Value, int(number))
-		if orderexist == 0 {
+		_, err1 := m.GetOrderUser(cookie.Value, int(number))
+		if err1 != nil {
 			//res.Write([]byte(cookie.Value))
+			log.Printf("%q", err1)
 			res.WriteHeader(http.StatusUnprocessableEntity)
 			return
 		}
