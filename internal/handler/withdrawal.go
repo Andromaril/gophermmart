@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -64,6 +65,7 @@ func NewWithdrawal(m storagedb.Storage) http.HandlerFunc {
 					res.WriteHeader(http.StatusPaymentRequired)
 					return
 				}
+				log.Printf("%q", err)
 				res.WriteHeader(http.StatusInternalServerError)
 				return
 			}
