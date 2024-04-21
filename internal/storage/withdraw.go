@@ -45,7 +45,7 @@ func (m *Storage) UpdateBalance(login string, withdrawal model.Withdrawn) error 
 	number, _ := strconv.Atoi(withdrawal.Order)
 	orderid, err1 := m.getOrderId(number)
 	if err1 != nil {
-		return fmt.Errorf("error insert %q", err1)
+		return fmt.Errorf("error insertt %q", err1)
 	}
 	user := m.getUserId(login)
 	if user != 0 && user != -1 {
@@ -64,18 +64,18 @@ func (m *Storage) UpdateBalance(login string, withdrawal model.Withdrawn) error 
 		_, err2 := m.DB.ExecContext(m.Ctx, `
 		UPDATE balances SET current=$1, withdrawn=$2 WHERE login=$3`, balance2.Current, balance2.Withdrawn, login)
 		if err != nil {
-			return fmt.Errorf("error insert %q", err2)
+			return fmt.Errorf("error insert3 %q", err2)
 		}
 	} else {
 
 		balance, err := m.GetAccural(number)
 		if err != nil {
-			return fmt.Errorf("error insert %q", err)
+			return fmt.Errorf("error insert2 %q", err)
 		}
 		_, err2 := m.DB.ExecContext(m.Ctx, `
 		INSERT INTO balances (login, current, withdrawn) values ($1, $2, $3)`, login, balance, 0)
 		if err != nil {
-			return fmt.Errorf("error insert %q", err2)
+			return fmt.Errorf("error insert1 %q", err2)
 		}
 	}
 
@@ -83,7 +83,7 @@ func (m *Storage) UpdateBalance(login string, withdrawal model.Withdrawn) error 
 	INSERT INTO withdrawals (login, order_id, sum, processed_at)
 	VALUES($1, $2, $3, $4)`, login, orderid, withdrawal.Sum, withdrawal.ProcessedAt)
 	if err3 != nil {
-		return fmt.Errorf("error insert %q", err3)
+		return fmt.Errorf("error insert0 %q", err3)
 	}
 	return nil
 }
