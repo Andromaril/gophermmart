@@ -48,7 +48,7 @@ func (m *Storage) UpdateBalance(login string, withdrawal model.Withdrawn) error 
 		return fmt.Errorf("error insert %q", err1)
 	}
 	user := m.getUserId(login)
-	if user != 0 && user != 1 {
+	if user != 0 && user != -1 {
 		balance, err := m.GetBalance(login)
 		if err != nil {
 			return fmt.Errorf("error balance %q", err)
@@ -96,7 +96,7 @@ func (m *Storage) getUserId(login string) int {
 		return 0
 	}
 	if !value.Valid {
-		return 1
+		return -1
 	}
 
 	return int(value.Int64)
