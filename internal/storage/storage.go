@@ -61,9 +61,20 @@ func (m *Storage) Bootstrap(ctx context.Context) error {
 	_, err = tx.ExecContext(m.Ctx, `
 		CREATE TABLE IF NOT EXISTS balances (
 			id SERIAL PRIMARY KEY,
-			login varchar(100) references users(login) , 
+			login varchar(100) NOT NULL, 
 			current DOUBLE PRECISION,
 			withdrawn DOUBLE PRECISION
+		);
+	`)
+	if err != nil {
+		return fmt.Errorf("fatal start a transaction %q", err)
+	}
+	_, err = tx.ExecContext(m.Ctx, `
+		CREATE TABLE IF NOT EXISTS withdrawals (
+			id SERIAL PRIMARY KEY,
+			login varchar(100) NOT NULL references orders(login), 
+			sum DOUBLE PRECISION,
+			processed_at TIMESTAMP WITH TIME ZONE NOT NULL
 		);
 	`)
 	if err != nil {

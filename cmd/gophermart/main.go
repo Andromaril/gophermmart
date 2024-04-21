@@ -37,6 +37,8 @@ func main() {
 	r.With(middleware.AuthMiddleware).Post("/api/user/orders", h.NewOrder(newdb))
 	r.With(middleware.AuthMiddleware).Get("/api/user/orders", h.GetOrder(newdb))
 	r.With(middleware.AuthMiddleware).Get("/api/user/balance", h.GetBalance(newdb))
+	r.With(middleware.AuthMiddleware).Post("/api/user/balance/withdraw", h.NewOrder(newdb))
+	r.With(middleware.AuthMiddleware).Get("/api/user/withdrawals", h.GetWithdrawal(newdb))
 	if err := http.ListenAndServe(flag.FlagRunAddr, r); err != nil {
 		panic(err)
 
