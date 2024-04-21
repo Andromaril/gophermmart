@@ -42,17 +42,17 @@ func (m *Storage) GetWithdrawal(login string) ([]model.Withdrawn, error) {
 
 func (m *Storage) UpdateBalance(login string, withdrawal model.Withdrawn) error {
 
-	balance, err := m.GetBalance(login)
-	if err != nil {
-		return fmt.Errorf("error insert %q", err)
-	}
 	number, _ := strconv.Atoi(withdrawal.Order)
 	orderid, err1 := m.getOrderId(number)
 	if err1 != nil {
-		return fmt.Errorf("error insert %q", err)
+		return fmt.Errorf("error insert %q", err1)
 	}
 	user, _ := m.getUserId(login)
 	if user != 0 {
+		balance, err := m.GetBalance(login)
+		if err != nil {
+			return fmt.Errorf("error balance %q", err)
+		}
 		if balance.Current < withdrawal.Sum {
 			return ErrNotBalance
 		}
@@ -82,7 +82,7 @@ func (m *Storage) UpdateBalance(login string, withdrawal model.Withdrawn) error 
 	_, err3 := m.DB.ExecContext(m.Ctx, `
 	INSERT INTO withdrawals (login, order_id, sum, processed_at)
 	VALUES($1, $2, $3, $4)`, login, orderid, withdrawal.Sum, withdrawal.ProcessedAt)
-	if err != nil {
+	if err3 != nil {
 		return fmt.Errorf("error insert %q", err3)
 	}
 	return nil
