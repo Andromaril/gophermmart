@@ -13,7 +13,7 @@ var ErrNotBalance = errors.New("malo!!!")
 
 func (m *Storage) GetWithdrawal(login string) ([]model.Withdrawn, error) {
 	result := make([]model.Withdrawn, 0)
-	rows, err := m.DB.QueryContext(m.Ctx, "SELECT orders.number, sum, processed_at FROM withdrawals INNER JOIN orders ON withdrawals.login = login WHERE login=$1", login)
+	rows, err := m.DB.QueryContext(m.Ctx, "SELECT orders.number, sum, processed_at FROM withdrawals INNER JOIN orders ON withdrawals.order_id = order_id WHERE login=$1", login)
 	//err := rows.Scan(&value)
 	if err != nil {
 		log.Println("This is a log message!")
