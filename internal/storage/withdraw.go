@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"strconv"
 	"time"
 
 	"github.com/andromaril/gophermmart/internal/model"
@@ -44,6 +45,11 @@ func (m *Storage) UpdateBalance(login string, withdrawal model.Withdrawn) error 
 	if err != nil {
 		return fmt.Errorf("error insert %q", err)
 	}
+	number, _ := strconv.Atoi(withdrawal.Order)
+	orderid, err1 := m.getOrderId(number)
+	if err1 != nil {
+		return fmt.Errorf("error insert %q", err)
+	}
 	if balance.Current < withdrawal.Sum {
 		return ErrNotBalance
 	}
@@ -58,8 +64,8 @@ func (m *Storage) UpdateBalance(login string, withdrawal model.Withdrawn) error 
 		return fmt.Errorf("error insert %q", err2)
 	}
 	_, err3 := m.DB.ExecContext(m.Ctx, `
-	INSERT INTO withdrawals (login, sum, processed_at)
-	VALUES($1, $2, $3)`, login, withdrawal.Sum, withdrawal.ProcessedAt)
+	INSERT INTO withdrawals (login, order_id, sum, processed_at)
+	VALUES($1, $2, $3, $4)`, login, orderid, withdrawal.Sum, withdrawal.ProcessedAt)
 	if err != nil {
 		return fmt.Errorf("error insert %q", err3)
 	}
