@@ -17,12 +17,15 @@ func GetOrder(m storagedb.Storage) http.HandlerFunc {
 		if err != nil {
 			// f := fmt.Sprint("%q", err)
 			// res.Write([]byte(f))
-			res.WriteHeader(http.StatusNoContent)
+			res.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 		for _, value := range result {
 			r = append(r, model.Order{Number: value.Number, Status: value.Status, Accrual: value.Accrual, UploadedAt: value.UploadedAt})
 
+		}
+		if len(r) == 0 {
+			res.WriteHeader(http.StatusNoContent)
 		}
 		enc := json.NewEncoder(res)
 		if err := enc.Encode(r); err != nil {
