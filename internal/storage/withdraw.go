@@ -15,7 +15,7 @@ var ErrNotBalance = errors.New("malo!!!")
 
 func (m *Storage) GetWithdrawal(login string) ([]model.Withdrawn, error) {
 	result := make([]model.Withdrawn, 0)
-	rows, err := m.DB.QueryContext(m.Ctx, "SELECT orders.number, sum, processed_at FROM withdrawals INNER JOIN orders ON withdrawals.order_id = order_id WHERE withdrawals.login=$1", login)
+	rows, err := m.DB.QueryContext(m.Ctx, "SELECT order, sum, processed_at FROM withdrawals WHERE login=$1", login)
 	//err := rows.Scan(&value)
 	if err != nil {
 		log.Printf("%q", err)
@@ -43,10 +43,10 @@ func (m *Storage) GetWithdrawal(login string) ([]model.Withdrawn, error) {
 func (m *Storage) UpdateBalance(login string, withdrawal model.Withdrawn) error {
 
 	number, _ := strconv.Atoi(withdrawal.Order)
-	orderid, err1 := m.getOrderId(number)
-	if err1 != nil {
-		return fmt.Errorf("error insertt %q", err1)
-	}
+	// orderid, err1 := m.getOrderId(number)
+	// if err1 != nil {
+	// 	return fmt.Errorf("error insertt %q", err1)
+	// }
 	user := m.getUserId(login)
 	if user != 0 && user != -1 {
 		balance, err := m.GetBalance(login)
@@ -80,8 +80,8 @@ func (m *Storage) UpdateBalance(login string, withdrawal model.Withdrawn) error 
 	}
 
 	_, err3 := m.DB.ExecContext(m.Ctx, `
-	INSERT INTO withdrawals (login, order_id, sum, processed_at)
-	VALUES($1, $2, $3, $4)`, login, orderid, withdrawal.Sum, withdrawal.ProcessedAt)
+	INSERT INTO withdrawals (login, order, sum, processed_at)
+	VALUES($1, $2, $3, $4)`, login, number, withdrawal.Sum, withdrawal.ProcessedAt)
 	if err3 != nil {
 		return fmt.Errorf("error insert0 %q", err3)
 	}
