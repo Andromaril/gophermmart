@@ -20,7 +20,7 @@ type Balance struct {
 }
 
 type Withdrawn struct {
-	Order     string    `json:"order"`
+	Order     int    `json:"order"`
 	Sum  float64   `json:"sum"`
 	ProcessedAt time.Time `json:"uploaded_at"`
 }

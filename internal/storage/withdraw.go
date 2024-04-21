@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"strconv"
 	"time"
 
 	"github.com/andromaril/gophermmart/internal/model"
@@ -26,7 +25,7 @@ func (m *Storage) GetWithdrawal(login string) ([]model.Withdrawn, error) {
 	defer rows.Close()
 	for rows.Next() {
 		var (
-			order       string
+			order       int
 			sum         float64
 			processedat time.Time
 		)
@@ -42,7 +41,7 @@ func (m *Storage) GetWithdrawal(login string) ([]model.Withdrawn, error) {
 
 func (m *Storage) UpdateBalance(login string, withdrawal model.Withdrawn) error {
 
-	number, _ := strconv.Atoi(withdrawal.Order)
+	//number, _ := strconv.Atoi(withdrawal.Order)
 	// orderid, err1 := m.getOrderId(number)
 	// if err1 != nil {
 	// 	return fmt.Errorf("error insertt %q", err1)
@@ -68,9 +67,9 @@ func (m *Storage) UpdateBalance(login string, withdrawal model.Withdrawn) error 
 		}
 	} else {
 
-		balance, err := m.GetAccural(number)
+		balance, err := m.GetAccural(withdrawal.Order)
 		if err != nil {
-			return fmt.Errorf("error insert2 %q, %s", err, number)
+			return fmt.Errorf("error insert2 %q, %s", err, withdrawal.Order)
 		}
 		_, err2 := m.DB.ExecContext(m.Ctx, `
 		INSERT INTO balances (login, current, withdrawn) values ($1, $2, $3)`, login, balance, 0)
@@ -81,7 +80,7 @@ func (m *Storage) UpdateBalance(login string, withdrawal model.Withdrawn) error 
 
 	_, err3 := m.DB.ExecContext(m.Ctx, `
 	INSERT INTO withdrawals (login, number, sum, processed_at)
-	VALUES($1, $2, $3, $4)`, login, number, withdrawal.Sum, withdrawal.ProcessedAt)
+	VALUES ($1, $2, $3, $4)`, login, withdrawal.Order, withdrawal.Sum, withdrawal.ProcessedAt)
 	if err3 != nil {
 		return fmt.Errorf("error insert0 %q", err3)
 	}
