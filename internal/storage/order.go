@@ -107,7 +107,7 @@ func (m *Storage) getOrderId(number string) (int, error) {
 
 func (m *Storage) GetAccural(login string) (float64, error) {
 	var value sql.NullFloat64
-	row := m.DB.QueryRowContext(m.Ctx, "SELECT accrual FROM orders WHERE lgin = $1", login)
+	row := m.DB.QueryRowContext(m.Ctx, "SELECT accrual FROM orders WHERE login = $1", login)
 	err := row.Scan(&value)
 	if err != nil {
 		return 0, fmt.Errorf("error select %q", err)
