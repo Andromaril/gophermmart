@@ -10,6 +10,7 @@ import (
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 
+	"github.com/andromaril/gophermmart/internal/accrual"
 	"github.com/andromaril/gophermmart/internal/flag"
 	h "github.com/andromaril/gophermmart/internal/handler"
 	"github.com/andromaril/gophermmart/internal/middleware"
@@ -36,6 +37,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	accrual.Accrual(&newdb)
 	defer db.Close()
 	//}
 	//defer db.Close()
