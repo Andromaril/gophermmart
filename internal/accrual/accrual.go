@@ -8,13 +8,16 @@ import (
 	"github.com/andromaril/gophermmart/internal/model"
 	storagedb "github.com/andromaril/gophermmart/internal/storage"
 	"github.com/go-resty/resty/v2"
+	"go.uber.org/zap"
 )
 
-func Accrual(storage *storagedb.Storage) error {
+func Accrual(storage *storagedb.Storage, sugar zap.SugaredLogger) error {
 	orders, err := storage.GetAccrualOrders()
 	if err != nil {
 		// f := fmt.Sprint("%q", err)
 		// res.Write([]byte(f))
+		sugar.Errorw(
+			"error when get order")
 		return err
 	}
 
@@ -27,7 +30,7 @@ func Accrual(storage *storagedb.Storage) error {
 			log.Printf("%q", err2)
 			return fmt.Errorf("error send request %q", err)
 		}
-		err3:= json.Unmarshal(response.Body(), &updateorder)
+		err3 := json.Unmarshal(response.Body(), &updateorder)
 		if err3 != nil {
 			log.Println("3")
 			log.Printf("%q", err3)

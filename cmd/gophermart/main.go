@@ -3,10 +3,10 @@ package main
 import (
 	"context"
 	"database/sql"
-	"log"
 	"net/http"
 
 	"github.com/go-chi/chi"
+	"go.uber.org/zap"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 
@@ -17,10 +17,19 @@ import (
 	storagedb "github.com/andromaril/gophermmart/internal/storage"
 )
 
+var sugar zap.SugaredLogger
+
 func main() {
 	var err error
 	//var storage storagedb.Storage
 	flag.ParseFlags()
+	logger, err2 := zap.NewDevelopment()
+	if err2 != nil {
+		panic(err2)
+	}
+	defer logger.Sync()
+	sugar = *logger.Sugar()
+	sugar.Infow("Starting server")
 	var newdb storagedb.Storage
 	var db *sql.DB
 	//if flag.Databaseflag != "" {
@@ -32,6 +41,15 @@ func main() {
 	//}
 	//defer db.Close()
 	//}
+	// var i int64
+	// for i = 0; ; i++ {
+	//time.Sleep(time.Second*5)
+	err1 := accrual.Accrual(&newdb, sugar)
+
+	if err1 != nil {
+		sugar.Infow("Not starting")
+	}
+	// }
 	r := chi.NewRouter()
 	//r.Use(middleware.AuthMiddlewareContext)
 	r.Post("/api/user/register", h.Register(newdb))
@@ -48,11 +66,6 @@ func main() {
 	//var i int64
 	//for i = 0; ; i++ {
 	//time.Sleep(time.Second)
-	err1 := accrual.Accrual(&newdb)
-	log.Println("start")
-	if err1 != nil {
-		log.Printf("%q", err1)
-	}
 
 	//}
 }
