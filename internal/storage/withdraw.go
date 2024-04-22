@@ -67,9 +67,9 @@ func (m *Storage) UpdateBalance(login string, withdrawal model.Withdrawn) error 
 		}
 	} else {
 
-		balance, err := m.GetAccural(withdrawal.Order)
+		balance, err := m.GetAccural(login)
 		if err != nil {
-			return fmt.Errorf("error insert2 %q, %s", err, withdrawal.Order)
+			return fmt.Errorf("error insert2 %q, %s", err, login)
 		}
 		_, err2 := m.DB.ExecContext(m.Ctx, `
 		INSERT INTO balances (login, current, withdrawn) values ($1, $2, $3)`, login, balance, 0)
