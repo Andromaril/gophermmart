@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/andromaril/gophermmart/internal/flag"
 	"github.com/andromaril/gophermmart/internal/model"
 	storagedb "github.com/andromaril/gophermmart/internal/storage"
 	"github.com/go-resty/resty/v2"
@@ -23,7 +24,9 @@ func Accrual(storage storagedb.Storage) error {
 	for _, order := range orders {
 		var updateorder model.Order
 		client := resty.New()
-		response, err2 := client.R().Get(client.BaseURL + "/api/orders/" + order.Number)
+		url := fmt.Sprintf("http://%s//api/orders/%s/", flag.BonusAddress, order.Number)
+		//response, err2 := client.R().Get(client.BaseURL + "/api/orders/" + order.Number)
+		response, err2 := client.R().Get(url)
 		if err2 != nil {
 			log.Println("1")
 			log.Printf("%q", err2)
