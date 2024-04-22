@@ -10,8 +10,8 @@ import (
 
 func (m *Storage) NewOrder(login string, order string) error {
 	_, err := m.DB.ExecContext(m.Ctx, `
-	INSERT INTO orders (login, number, status, uploadedat)
-	VALUES($1, $2, $3, $4)`, login, order, "NEW", time.Now().Format(time.RFC3339))
+	INSERT INTO orders (login, number, status, accrual, uploadedat)
+	VALUES($1, $2, $3, $4)`, login, order, "NEW", 0, time.Now().Format(time.RFC3339))
 	if err != nil {
 		return fmt.Errorf("error insert %q", err)
 	}
