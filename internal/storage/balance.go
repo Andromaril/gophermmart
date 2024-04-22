@@ -26,3 +26,27 @@ func (m *Storage) GetBalance(login string) (model.Balance, error) {
 	}
 	return result, nil
 }
+
+func (m *Storage) UpdateBalanceAccrual(number string, accrual *float64) error {
+	login, err := m.GetUserLogin(number)
+	if err != nil {
+		log.Println("This is not login!")
+		return fmt.Errorf("invalid login %q", err)
+	}
+
+	result, err := m.GetBalance(login)
+	if err != nil {
+		log.Println("This is not balance!")
+		return fmt.Errorf("invalid balance %q", err)
+	}
+	balancenew := model.Balance{
+		Current:   result.Current + *accrual,
+		Withdrawn: result.Withdrawn,
+	}
+	_, err2 := m.DB.ExecContext(m.Ctx, `
+	UPDATE balances SET current=$1 WHERE login=$3`, balancenew.Current, login)
+	if err2 != nil {
+		return fmt.Errorf("error insert3 %q", err2)
+	}
+	return nil
+}

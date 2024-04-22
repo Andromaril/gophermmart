@@ -4,11 +4,13 @@ import (
 	"context"
 	"database/sql"
 	"net/http"
+	"time"
 
 	"github.com/go-chi/chi"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 
+	"github.com/andromaril/gophermmart/internal/accrual"
 	"github.com/andromaril/gophermmart/internal/flag"
 	h "github.com/andromaril/gophermmart/internal/handler"
 	"github.com/andromaril/gophermmart/internal/middleware"
@@ -41,6 +43,12 @@ func main() {
 	r.With(middleware.AuthMiddleware).Get("/api/user/withdrawals", h.GetWithdrawal(newdb))
 	if err := http.ListenAndServe(flag.FlagRunAddr, r); err != nil {
 		panic(err)
+
+	}
+	var i int64
+	for i = 0; ; i++ {
+		time.Sleep(time.Second)
+		accrual.Accrual(&newdb)
 
 	}
 }

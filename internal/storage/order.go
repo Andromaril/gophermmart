@@ -118,3 +118,57 @@ func (m *Storage) GetAccural(login string) (float64, error) {
 
 	return value.Float64, nil
 }
+
+func (m *Storage) GetAccrualOrders() ([]model.Order, error) {
+	result := make([]model.Order, 0)
+	rows, err := m.DB.QueryContext(m.Ctx, "SELECT number, status, accrual, uploadedat FROM orders WHERE  WHERE status = 'NEW' OR status = 'PROCESSING'")
+	if err != nil {
+		return result, fmt.Errorf("invalid login %q", err)
+	}
+
+	// обязательно закрываем перед возвратом функции
+	defer rows.Close()
+
+	// пробегаем по всем записям
+	for rows.Next() {
+		var (
+			number     string
+			status     string
+			accrual    *float64
+			uploadedat time.Time
+		)
+		err = rows.Scan(&number, &status, &accrual, &uploadedat)
+		if err != nil {
+			return result, fmt.Errorf("invalid login %q", err)
+		}
+		result = append(result, model.Order{Number: number, Status: status, Accrual: accrual, UploadedAt: uploadedat})
+	}
+	err = rows.Err()
+	if err != nil {
+		return result, fmt.Errorf("invalid login %q", err)
+	}
+	return result, nil
+}
+
+func (m *Storage) UpdateOrderAccrual(accrual *float64, status string, number string) error {
+	_, err2 := m.DB.ExecContext(m.Ctx, `
+		UPDATE orders SET accrual=$1, status=$2 WHERE number=$3`, accrual, status, number)
+	if err2 != nil {
+		return fmt.Errorf("error insert3 %q", err2)
+	}
+	return nil
+}
+
+func (m *Storage) GetUserLogin(number string) (string, error) {
+	var value sql.NullString
+	row := m.DB.QueryRowContext(m.Ctx, "SELECT login FROM orders WHERE number = $1", number)
+	err := row.Scan(&value)
+	if err != nil {
+		return "", fmt.Errorf("error select %q", err)
+	}
+	if !value.Valid {
+		return "", fmt.Errorf("invalid login %q", err)
+	}
+
+	return value.String, nil
+}
