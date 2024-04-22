@@ -3,8 +3,8 @@ package main
 import (
 	"context"
 	"database/sql"
+	"log"
 	"net/http"
-	"time"
 
 	"github.com/go-chi/chi"
 
@@ -45,10 +45,14 @@ func main() {
 		panic(err)
 
 	}
-	var i int64
-	for i = 0; ; i++ {
-		time.Sleep(time.Second)
-		accrual.Accrual(&newdb)
-
+	//var i int64
+	//for i = 0; ; i++ {
+	//time.Sleep(time.Second)
+	err1 := accrual.Accrual(&newdb)
+	log.Println("start")
+	if err1 != nil {
+		log.Printf("%q", err1)
 	}
+
+	//}
 }
