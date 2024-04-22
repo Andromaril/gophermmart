@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/andromaril/gophermmart/internal/model"
 	storagedb "github.com/andromaril/gophermmart/internal/storage"
@@ -46,8 +47,8 @@ func NewWithdrawal(m storagedb.Storage) http.HandlerFunc {
 			return
 		}
 		cookie, _ := req.Cookie("Login")
-		//number, _ := strconv.Atoi(r.Order)
-		validnumer := luhn.Valid(r.Order)
+		number, _ := strconv.Atoi(r.Order)
+		validnumer := luhn.Valid(number)
 		// _, err1 := m.GetOrderUser(cookie.Value, int(number))
 		// if err1 != nil {
 		// 	//res.Write([]byte(cookie.Value))

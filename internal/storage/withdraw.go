@@ -25,7 +25,7 @@ func (m *Storage) GetWithdrawal(login string) ([]model.Withdrawn, error) {
 	defer rows.Close()
 	for rows.Next() {
 		var (
-			order       int
+			order       string
 			sum         float64
 			processedat time.Time
 		)

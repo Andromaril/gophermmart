@@ -8,9 +8,9 @@ import (
 	"github.com/andromaril/gophermmart/internal/model"
 )
 
-func (m *Storage) NewOrder(login string, order int) error {
+func (m *Storage) NewOrder(login string, order string) error {
 	_, err := m.DB.ExecContext(m.Ctx, `
-	INSERT INTO orders (login, number, status, uploadedat)
+	INSERT INTO orders (login, order, status, uploadedat)
 	VALUES($1, $2, $3, $4)`, login, order, "NEW", time.Now().Format(time.RFC3339))
 	if err != nil {
 		return fmt.Errorf("error insert %q", err)
@@ -18,9 +18,9 @@ func (m *Storage) NewOrder(login string, order int) error {
 	return nil
 }
 
-func (m *Storage) GetOrderUser(login string, order int) (int, error) {
+func (m *Storage) GetOrderUser(login string, order string) (int, error) {
 	var value sql.NullInt64
-	rows := m.DB.QueryRowContext(m.Ctx, "SELECT id FROM orders WHERE login=$1 AND number=$2", login, order)
+	rows := m.DB.QueryRowContext(m.Ctx, "SELECT id FROM orders WHERE login=$1 AND order=$2", login, order)
 	err := rows.Scan(&value)
 	if err != nil {
 		return 0, fmt.Errorf("error select %q", err)
@@ -32,10 +32,10 @@ func (m *Storage) GetOrderUser(login string, order int) (int, error) {
 	return int(value.Int64), nil
 }
 
-func (m *Storage) GetOrderAnotherUser(order int) (string, error) {
+func (m *Storage) GetOrderAnotherUser(order string) (string, error) {
 	var value sql.NullString
 
-	rows2 := m.DB.QueryRowContext(m.Ctx, "SELECT login FROM orders WHERE number=$1", order)
+	rows2 := m.DB.QueryRowContext(m.Ctx, "SELECT login FROM orders WHERE order=$1", order)
 	err2 := rows2.Scan(&value)
 	if err2 != nil {
 		return "", fmt.Errorf("error select %q", err2)
@@ -48,7 +48,7 @@ func (m *Storage) GetOrderAnotherUser(order int) (string, error) {
 
 func (m *Storage) GetAllOrders(login string) ([]model.Order, error) {
 	result := make([]model.Order, 0)
-	rows, err := m.DB.QueryContext(m.Ctx, "SELECT number, status, accrual, uploadedat FROM orders WHERE login=$1", login)
+	rows, err := m.DB.QueryContext(m.Ctx, "SELECT order, status, accrual, uploadedat FROM orders WHERE login=$1", login)
 	if err != nil {
 		return result, fmt.Errorf("invalid login %q", err)
 	}
@@ -77,9 +77,9 @@ func (m *Storage) GetAllOrders(login string) ([]model.Order, error) {
 	return result, nil
 }
 
-func (m *Storage) getOrderId(number int) (int, error) {
+func (m *Storage) getOrderId(number string) (int, error) {
 	var value sql.NullInt64
-	row := m.DB.QueryRowContext(m.Ctx, "SELECT id FROM orders WHERE number = $1", number)
+	row := m.DB.QueryRowContext(m.Ctx, "SELECT id FROM orders WHERE order = $1", number)
 	err := row.Scan(&value)
 	if err != nil {
 		return 0, fmt.Errorf("error select %q", err)
@@ -91,7 +91,7 @@ func (m *Storage) getOrderId(number int) (int, error) {
 	return int(value.Int64), nil
 }
 
-func (m *Storage) GetAccural(number int) (float64, error) {
+func (m *Storage) GetAccural(number string) (float64, error) {
 	var value sql.NullFloat64
 	row := m.DB.QueryRowContext(m.Ctx, "SELECT accrual FROM orders WHERE number = $1", number)
 	err := row.Scan(&value)

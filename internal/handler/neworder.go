@@ -24,18 +24,18 @@ func NewOrder(m storagedb.Storage) http.HandlerFunc {
 		number2, _ := strconv.Atoi(number)
 		validnumer := luhn.Valid(number2)
 		if validnumer {
-			orderexist, _ := m.GetOrderUser(cookie.Value, number2)
+			orderexist, _ := m.GetOrderUser(cookie.Value, number)
 			if orderexist != 0 {
 				//res.Write([]byte(cookie.Value))
 				res.WriteHeader(http.StatusOK)
 				return
 			}
-			orderexist2, _ := m.GetOrderAnotherUser(number2)
+			orderexist2, _ := m.GetOrderAnotherUser(number)
 			if orderexist2 != "" && orderexist2 != cookie.Value {
 				res.WriteHeader(http.StatusConflict)
 				return
 			}
-			err := m.NewOrder(cookie.Value, number2)
+			err := m.NewOrder(cookie.Value, number)
 			if err != nil {
 				// f := fmt.Sprint("%q", err)
 				// res.Write([]byte(f))
