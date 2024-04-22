@@ -24,7 +24,7 @@ func Accrual(storage storagedb.Storage) error {
 	for _, order := range orders {
 		var updateorder model.Order
 		client := resty.New()
-		url := fmt.Sprintf("http://%s//api/orders/%s/", flag.BonusAddress, order.Number)
+		url := fmt.Sprintf("%s/api/orders/%s/", flag.BonusAddress, order.Number)
 		//response, err2 := client.R().Get(client.BaseURL + "/api/orders/" + order.Number)
 		response, err2 := client.R().Get(url)
 		if err2 != nil {
