@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/andromaril/gophermmart/internal/accrual"
 	"github.com/andromaril/gophermmart/internal/model"
 	storagedb "github.com/andromaril/gophermmart/internal/storage"
 	"github.com/theplant/luhn"
@@ -57,6 +58,10 @@ func NewWithdrawal(m storagedb.Storage) http.HandlerFunc {
 		// 	return
 		// }
 		if validnumer {
+			err1 := accrual.Accrual(m)
+			if err1 != nil {
+				log.Printf("%q", err1)
+			}
 			err := m.UpdateBalance(cookie.Value, r)
 			if err != nil {
 				// f := fmt.Sprint("%q", err)

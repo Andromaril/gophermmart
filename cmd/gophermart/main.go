@@ -10,7 +10,6 @@ import (
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 
-	"github.com/andromaril/gophermmart/internal/accrual"
 	"github.com/andromaril/gophermmart/internal/flag"
 	h "github.com/andromaril/gophermmart/internal/handler"
 	"github.com/andromaril/gophermmart/internal/middleware"
@@ -44,11 +43,11 @@ func main() {
 	// var i int64
 	// for i = 0; ; i++ {
 	//time.Sleep(time.Second*5)
-	err1 := accrual.Accrual(&newdb, sugar)
+	// err1 := accrual.Accrual(&newdb, sugar)
 
-	if err1 != nil {
-		sugar.Infow("Not starting")
-	}
+	// if err1 != nil {
+	// 	sugar.Infow("Not starting")
+	// }
 	// }
 	r := chi.NewRouter()
 	//r.Use(middleware.AuthMiddlewareContext)

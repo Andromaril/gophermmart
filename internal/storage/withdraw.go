@@ -66,7 +66,6 @@ func (m *Storage) UpdateBalance(login string, withdrawal model.Withdrawn) error 
 			return fmt.Errorf("error insert3 %q", err2)
 		}
 	} else {
-
 		balance, err := m.GetAccural(login)
 		if err != nil {
 			return fmt.Errorf("error insert2 %q, %s", err, login)
