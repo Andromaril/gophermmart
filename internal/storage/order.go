@@ -121,7 +121,7 @@ func (m *Storage) GetAccural(login string) (float64, error) {
 
 func (m *Storage) GetAccrualOrders() ([]model.Order, error) {
 	result := make([]model.Order, 0)
-	rows, err := m.DB.QueryContext(m.Ctx, "SELECT number, status, accrual, uploadedat FROM orders WHERE  WHERE status = 'NEW' OR status = 'PROCESSING'")
+	rows, err := m.DB.QueryContext(m.Ctx, "SELECT number, status, accrual, uploadedat FROM orders WHERE status = 'NEW' OR status = 'PROCESSING'")
 	if err != nil {
 		return result, fmt.Errorf("invalid login %q", err)
 	}
