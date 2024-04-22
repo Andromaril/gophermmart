@@ -49,7 +49,7 @@ func (m *Storage) Bootstrap(ctx context.Context) error {
 		CREATE TABLE IF NOT EXISTS orders (
 			id SERIAL PRIMARY KEY,
 			login varchar(100) NOT NULL, 
-			order string,
+			number varchar(100) NOT NULL,
 			status varchar(100),
 			accrual DOUBLE PRECISION,
 			uploadedat TIMESTAMP WITH TIME ZONE NOT NULL
@@ -72,7 +72,7 @@ func (m *Storage) Bootstrap(ctx context.Context) error {
 	_, err = tx.ExecContext(m.Ctx, `
 		CREATE TABLE IF NOT EXISTS withdrawals (
 			id SERIAL PRIMARY KEY,
-			order string,
+			number varchar(100) NOT NULL,
 			login varchar(100) NOT NULL, 
 			sum DOUBLE PRECISION,
 			processed_at TIMESTAMP WITH TIME ZONE NOT NULL
