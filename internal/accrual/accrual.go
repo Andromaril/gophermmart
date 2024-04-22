@@ -34,7 +34,7 @@ func Accrual(storage storagedb.Storage) error {
 		}
 		err3 := json.Unmarshal(response.Body(), &updateorder)
 		if err3 != nil {
-			log.Println("3")
+			log.Println(updateorder)
 			log.Printf("%q", err3)
 			return fmt.Errorf("error send request %q", err3)
 		}
