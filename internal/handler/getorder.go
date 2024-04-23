@@ -34,6 +34,7 @@ func GetOrder(m storagedb.Storage) http.HandlerFunc {
 			return
 		}
 		log.Println(r, cookie.Value)
+		log.Println(res)
 		res.WriteHeader(http.StatusOK)
 	}
 }
