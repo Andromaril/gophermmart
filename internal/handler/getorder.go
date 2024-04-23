@@ -2,7 +2,6 @@ package handler
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 
 	"github.com/andromaril/gophermmart/internal/model"
@@ -33,8 +32,8 @@ func GetOrder(m storagedb.Storage) http.HandlerFunc {
 		if err := enc.Encode(r); err != nil {
 			return
 		}
-		log.Println(r, cookie.Value)
-		log.Println(res)
+		//log.Println(r, cookie.Value)
+		//log.Println(res)
 		res.WriteHeader(http.StatusOK)
 	}
 }
