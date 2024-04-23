@@ -14,7 +14,7 @@ var (
 func ParseFlags() {
 	flag.StringVar(&FlagRunAddr, "a", "localhost:8080", "address and port to run server")
 	flag.StringVar(&Databaseflag, "d", "", "database path")
-	flag.StringVar(&BonusAddress, "r", "http://localhost:8080", "bonus address")
+	flag.StringVar(&BonusAddress, "r", "", "bonus address")
 	flag.Parse()
 	if envRunAddr := os.Getenv("RUN_ADDRESS"); envRunAddr != "" {
 		FlagRunAddr = envRunAddr
