@@ -3,10 +3,13 @@ package main
 import (
 	"context"
 	"database/sql"
+	"fmt"
+	"log"
 	"net/http"
 	"time"
 
 	"github.com/go-chi/chi"
+	"github.com/go-resty/resty/v2"
 	"go.uber.org/zap"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
@@ -25,7 +28,7 @@ func Update(newdb *storagedb.Storage) {
 		if err1 != nil {
 			sugar.Infow("Not starting")
 		}
-		time.Sleep(time.Second*5)
+		time.Sleep(time.Second * 5)
 	}
 }
 
@@ -51,6 +54,11 @@ func main() {
 	}
 	//go accrual.Accrual(&newdb)
 	defer db.Close()
+	log.Println(flag.BonusAddress)
+	client := resty.New()
+	//response, err2 := client.R().Get(client.BaseURL + "/api/orders/" + order.Number)
+	response, err2 := client.R().Get(flag.BonusAddress)
+	log.Println(response)
 	//}
 	//defer db.Close()
 	//}
