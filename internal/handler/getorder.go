@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 
 	"github.com/andromaril/gophermmart/internal/model"
@@ -22,6 +23,7 @@ func GetOrder(m storagedb.Storage) http.HandlerFunc {
 		}
 		for _, value := range result {
 			r = append(r, model.Order{Number: value.Number, Status: value.Status, Accrual: value.Accrual, UploadedAt: value.UploadedAt})
+			log.Println(r)
 
 		}
 		if len(r) == 0 {
@@ -31,6 +33,7 @@ func GetOrder(m storagedb.Storage) http.HandlerFunc {
 		if err := enc.Encode(r); err != nil {
 			return
 		}
+		log.Println(r)
 		res.WriteHeader(http.StatusOK)
 	}
 }
