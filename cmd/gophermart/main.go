@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"net/http"
+	"time"
 
 	"github.com/go-chi/chi"
 	"go.uber.org/zap"
@@ -16,6 +17,17 @@ import (
 	"github.com/andromaril/gophermmart/internal/middleware"
 	storagedb "github.com/andromaril/gophermmart/internal/storage"
 )
+
+func Update(newdb *storagedb.Storage) {
+	for {
+		err1 := accrual.Accrual(newdb)
+
+		if err1 != nil {
+			sugar.Infow("Not starting")
+		}
+		time.Sleep(time.Second*5)
+	}
+}
 
 var sugar zap.SugaredLogger
 
@@ -37,7 +49,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	accrual.Accrual(&newdb)
+	//go accrual.Accrual(&newdb)
 	defer db.Close()
 	//}
 	//defer db.Close()
@@ -51,6 +63,8 @@ func main() {
 	// 	sugar.Infow("Not starting")
 	// }
 	// }
+	//time.Sleep(time.Second*5)
+	go Update(&newdb)
 	r := chi.NewRouter()
 	//r.Use(middleware.AuthMiddlewareContext)
 	r.Post("/api/user/register", h.Register(newdb))
@@ -60,10 +74,13 @@ func main() {
 	r.With(middleware.AuthMiddleware).Get("/api/user/balance", h.GetBalance(newdb))
 	r.With(middleware.AuthMiddleware).Post("/api/user/balance/withdraw", h.NewWithdrawal(newdb))
 	r.With(middleware.AuthMiddleware).Get("/api/user/withdrawals", h.GetWithdrawal(newdb))
+	//go accrual.Accrual(&newdb)
 	if err := http.ListenAndServe(flag.FlagRunAddr, r); err != nil {
 		panic(err)
 
 	}
+	//go Update(&newdb)
+	//go accrual.Accrual(&newdb)
 	//var i int64
 	//for i = 0; ; i++ {
 	//time.Sleep(time.Second)
