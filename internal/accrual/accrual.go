@@ -55,6 +55,7 @@ func Accrual(storage *storagedb.Storage) error {
 
 		if updateorder.Accrual != nil {
 			err := storage.UpdateBalanceAccrual(updateorder.Number, updateorder.Accrual)
+			log.Println(updateorder.Number)
 			if err != nil {
 				log.Println("5")
 				log.Printf("%q", err)
