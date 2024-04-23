@@ -26,7 +26,7 @@ func Accrual(storage *storagedb.Storage) error {
 		log.Println(order)
 		var updateorder model.Order
 		client := resty.New()
-		url := fmt.Sprintf("%s/api/orders/%s/", flag.BonusAddress, order.Number)
+		url := fmt.Sprintf("%s/api/orders/%s", flag.BonusAddress, order.Number)
 		log.Println(url)
 		//response, err2 := client.R().Get(client.BaseURL + "/api/orders/" + order.Number)
 		response, err2 := client.R().Get(url)
