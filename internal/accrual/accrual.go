@@ -52,7 +52,7 @@ func Accrual(storage *storagedb.Storage) error {
 				return fmt.Errorf("error send request %q", err4)
 			}
 		}
-
+		log.Println(updateorder.Accrual)
 		if updateorder.Accrual != nil {
 			err := storage.UpdateBalanceAccrual(updateorder.Number, updateorder.Accrual)
 			log.Println(updateorder.Number)
