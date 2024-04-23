@@ -43,8 +43,10 @@ func (m *Storage) UpdateBalanceAccrual(number string, accrual *float64) error {
 		Current:   result.Current + *accrual,
 		Withdrawn: result.Withdrawn,
 	}
+	// _, err2 := m.DB.ExecContext(m.Ctx, `
+	// UPDATE balances SET current=$1 WHERE login=$2`, balancenew.Current, login)
 	_, err2 := m.DB.ExecContext(m.Ctx, `
-	UPDATE balances SET current=$1 WHERE login=$2`, balancenew.Current, login)
+	 INSERT INTO balances (login, current, withdrawn) VALUES($1, $2, $3) ON CONFLICT (login) DO UPDATE SET current=$2, withdrawn=$3`, login, balancenew.Current, balancenew.Withdrawn)
 	if err2 != nil {
 		return fmt.Errorf("error insert3 %q", err2)
 	}
