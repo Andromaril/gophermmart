@@ -32,10 +32,10 @@ func Register(m storagedb.Storage) http.HandlerFunc {
 		hash := md5.Sum([]byte(user.Password))
 		hashedPass := hex.EncodeToString(hash[:])
 		value := m.GetUser(user.Login)
-		if value == 0 {
+		if value != 0 {
 			res.WriteHeader(http.StatusConflict)
 			return
-		}
+		} 
 		err3 := m.NewUser(user.Login, hashedPass)
 		if err3 != nil {
 			e := errormart.NewMartError(err3)
