@@ -41,17 +41,13 @@ func (m *Storage) GetOrderUser(login string, order string) (int, error) {
 func (m *Storage) GetOrderAnotherUser(order string) (string, error) {
 	var value sql.NullString
 
-	rows := m.DB.QueryRowContext(m.Ctx, "SELECT login FROM orders WHERE number=$1", order)
-	err := rows.Scan(&value)
-	if err != nil {
-		if err == pgx.ErrNoRows {
-			e := errormart.NewMartError(err)
-			return "", fmt.Errorf("error select %q", e.Error())
-		}
-		//return "error", fmt.Errorf("error select %q", err)
+	rows2 := m.DB.QueryRowContext(m.Ctx, "SELECT login FROM orders WHERE number=$1", order)
+	err2 := rows2.Scan(&value)
+	if err2 != nil {
+		return "", fmt.Errorf("error select %q", err2)
 	}
 	if !value.Valid {
-		return "error", fmt.Errorf("invalid login %q", err)
+		return "", fmt.Errorf("invalid login %q", err2)
 	}
 	return value.String, nil
 }
