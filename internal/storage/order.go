@@ -5,9 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/andromaril/gophermmart/internal/errormart"
 	"github.com/andromaril/gophermmart/internal/model"
-	"github.com/jackc/pgx/v4"
 )
 
 func (m *Storage) NewOrder(login string, order string) error {
@@ -25,14 +23,10 @@ func (m *Storage) GetOrderUser(login string, order string) (int, error) {
 	rows := m.DB.QueryRowContext(m.Ctx, "SELECT id FROM orders WHERE login=$1 AND number=$2", login, order)
 	err := rows.Scan(&value)
 	if err != nil {
-		if err == pgx.ErrNoRows {
-			e := errormart.NewMartError(err)
-			return 0, fmt.Errorf("error select %q", e.Error())
-		}
-		//return -1, fmt.Errorf("error select %q", err)
+		return 0, fmt.Errorf("error select %q", err)
 	}
 	if !value.Valid {
-		return -1, fmt.Errorf("invalid id %q", err)
+		return 0, fmt.Errorf("invalid login %q", err)
 	}
 
 	return int(value.Int64), nil
