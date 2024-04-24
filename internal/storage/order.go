@@ -7,7 +7,7 @@ import (
 
 	"github.com/andromaril/gophermmart/internal/errormart"
 	"github.com/andromaril/gophermmart/internal/model"
-	"github.com/jackc/pgx"
+	"github.com/jackc/pgx/v4"
 )
 
 func (m *Storage) NewOrder(login string, order string) error {
