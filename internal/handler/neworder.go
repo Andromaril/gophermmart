@@ -26,10 +26,8 @@ func NewOrder(m storagedb.Storage) http.HandlerFunc {
 		number2, _ := strconv.Atoi(number)
 		validnumer := luhn.Valid(number2)
 		if validnumer {
-			orderexist, err3 := m.GetOrderUser(cookie.Value, number)
+			orderexist := m.GetOrderUser(cookie.Value, number)
 			if orderexist != 0 {
-				e := errormart.NewMartError(err3)
-				log.Error(e.Error())
 				res.WriteHeader(http.StatusOK)
 				return
 			}

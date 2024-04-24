@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/andromaril/gophermmart/internal/errormart"
 	"github.com/andromaril/gophermmart/internal/model"
+	log "github.com/sirupsen/logrus"
 )
 
 func (m *Storage) NewOrder(login string, order string) error {
@@ -18,15 +20,18 @@ func (m *Storage) NewOrder(login string, order string) error {
 	return nil
 }
 
-func (m *Storage) GetOrderUser(login string, order string) (int, error) {
+func (m *Storage) GetOrderUser(login string, order string) int {
 	var value sql.NullInt64
 	rows := m.DB.QueryRowContext(m.Ctx, "SELECT id FROM orders WHERE login=$1 AND number=$2", login, order)
 	err := rows.Scan(&value)
 	if err != nil {
-		return 0, fmt.Errorf("error select %q", err)
+		e := errormart.NewMartError(err)
+		log.Error(e.Error())
+		return 0
 	}
 	if !value.Valid {
-		return 0, fmt.Errorf("invalid login %q", err)
+		log.Error("invalid id")
+		return 0
 	}
 
 	return int(value.Int64), nil
