@@ -13,7 +13,8 @@ func (m *Storage) NewUser(login string, password string) error {
 	INSERT INTO users (login, password)
 	VALUES($1, $2)`, login, password)
 	if err != nil {
-		return fmt.Errorf("error insert %q", err)
+		e := errormart.NewMartError(err)
+		return fmt.Errorf("error insert %q", e.Error())
 	}
 	return nil
 }

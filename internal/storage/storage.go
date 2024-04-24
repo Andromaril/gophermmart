@@ -4,6 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+
+	"github.com/andromaril/gophermmart/internal/errormart"
 )
 
 type Storage struct {
@@ -28,12 +30,11 @@ func (m *Storage) Init(path string, ctx context.Context) (*sql.DB, error) {
 }
 
 func (m *Storage) Bootstrap(ctx context.Context) error {
-	// запускаем транзакцию
 	tx, err := m.DB.BeginTx(ctx, nil)
 	if err != nil {
-		return fmt.Errorf("fatal start a transaction %q", err)
+		e := errormart.NewMartError(err)
+		return fmt.Errorf("fatal start a transaction %q", e.Error())
 	}
-	// в случае неуспешного коммита все изменения транзакции будут отменены
 	defer tx.Rollback()
 	_, err = tx.ExecContext(m.Ctx, `
 		CREATE TABLE IF NOT EXISTS users (
@@ -43,7 +44,8 @@ func (m *Storage) Bootstrap(ctx context.Context) error {
 		);
 	`)
 	if err != nil {
-		return fmt.Errorf("fatal start a transaction %q", err)
+		e := errormart.NewMartError(err)
+		return fmt.Errorf("fatal start a transaction %q", e.Error())
 	}
 	_, err = tx.ExecContext(m.Ctx, `
 		CREATE TABLE IF NOT EXISTS orders (
@@ -56,7 +58,8 @@ func (m *Storage) Bootstrap(ctx context.Context) error {
 		);
 	`)
 	if err != nil {
-		return fmt.Errorf("fatal start a transaction %q", err)
+		e := errormart.NewMartError(err)
+		return fmt.Errorf("fatal start a transaction %q", e.Error())
 	}
 	_, err = tx.ExecContext(m.Ctx, `
 		CREATE TABLE IF NOT EXISTS balances (
@@ -67,7 +70,8 @@ func (m *Storage) Bootstrap(ctx context.Context) error {
 		);
 	`)
 	if err != nil {
-		return fmt.Errorf("fatal start a transaction %q", err)
+		e := errormart.NewMartError(err)
+		return fmt.Errorf("fatal start a transaction %q", e.Error())
 	}
 	_, err = tx.ExecContext(m.Ctx, `
 		CREATE TABLE IF NOT EXISTS withdrawals (
@@ -79,7 +83,8 @@ func (m *Storage) Bootstrap(ctx context.Context) error {
 		);
 	`)
 	if err != nil {
-		return fmt.Errorf("fatal start a transaction %q", err)
+		e := errormart.NewMartError(err)
+		return fmt.Errorf("fatal start a transaction %q", e.Error())
 	}
 	return tx.Commit()
 }
