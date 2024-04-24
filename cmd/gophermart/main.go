@@ -11,6 +11,7 @@ import (
 	_ "github.com/jackc/pgx/v5/stdlib"
 
 	"github.com/andromaril/gophermmart/internal/accrual"
+	"github.com/andromaril/gophermmart/internal/errormart"
 	"github.com/andromaril/gophermmart/internal/flag"
 	h "github.com/andromaril/gophermmart/internal/handler"
 	"github.com/andromaril/gophermmart/internal/middleware"
@@ -20,10 +21,12 @@ import (
 
 func Update(newdb *storagedb.Storage) {
 	for {
+		log.Info("start send request to accrual")
 		err := accrual.Accrual(newdb)
 
 		if err != nil {
-			log.Info("start send request to accrual")
+			e := errormart.NewMartError(err)
+			log.Error("error witg accraul ", e.Error())
 		}
 		time.Sleep(time.Second * 5)
 	}
