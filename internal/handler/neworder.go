@@ -5,7 +5,9 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/andromaril/gophermmart/internal/errormart"
 	storagedb "github.com/andromaril/gophermmart/internal/storage"
+	log "github.com/sirupsen/logrus"
 	"github.com/theplant/luhn"
 )
 
@@ -24,9 +26,10 @@ func NewOrder(m storagedb.Storage) http.HandlerFunc {
 		number2, _ := strconv.Atoi(number)
 		validnumer := luhn.Valid(number2)
 		if validnumer {
-			orderexist, _ := m.GetOrderUser(cookie.Value, number)
+			orderexist, err3 := m.GetOrderUser(cookie.Value, number)
 			if orderexist != 0 {
-				//res.Write([]byte(cookie.Value))
+				e := errormart.NewMartError(err3)
+				log.Error(e.Error())
 				res.WriteHeader(http.StatusOK)
 				return
 			}
