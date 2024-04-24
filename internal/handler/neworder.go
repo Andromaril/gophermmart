@@ -31,13 +31,13 @@ func NewOrder(m storagedb.Storage) http.HandlerFunc {
 			return
 		}
 		if validnumer {
-			orderexist, err1 := m.GetOrderUser(cookie.Value, number)
-			if err1 != nil && (orderexist == 0 || orderexist == -1) {
-				e := errormart.NewMartError(err1)
-				log.Error(e.Error())
-				res.WriteHeader(http.StatusInternalServerError)
-				return
-			}
+			orderexist, _ := m.GetOrderUser(cookie.Value, number)
+			// if err1 != nil && (orderexist == 0 || orderexist == -1) {
+			// 	e := errormart.NewMartError(err1)
+			// 	log.Error(e.Error())
+			// 	res.WriteHeader(http.StatusInternalServerError)
+			// 	return
+			// }
 			if orderexist != 0 && orderexist != -1 {
 				res.WriteHeader(http.StatusOK)
 				return
