@@ -29,7 +29,7 @@ func (m *Storage) GetOrderUser(login string, order string) (int, error) {
 			e := errormart.NewMartError(err)
 			return 0, fmt.Errorf("error select %q", e.Error())
 		}
-		return -1, fmt.Errorf("error select %q", err)
+		//return -1, fmt.Errorf("error select %q", err)
 	}
 	if !value.Valid {
 		return -1, fmt.Errorf("invalid id %q", err)
