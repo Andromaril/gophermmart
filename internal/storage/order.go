@@ -20,22 +20,21 @@ func (m *Storage) NewOrder(login string, order string) error {
 	return nil
 }
 
-func (m *Storage) GetOrderUser(login string, order string) (int, error) {
+func (m *Storage) GetOrderUser(login string, order string) (int) {
 	var value sql.NullInt64
 	rows := m.DB.QueryRowContext(m.Ctx, "SELECT id FROM orders WHERE login=$1 AND number=$2", login, order)
 	err := rows.Scan(&value)
 	if err != nil {
 		if err == pgx.ErrNoRows {
-			e := errormart.NewMartError(err)
-			return 0, fmt.Errorf("error select %q", e.Error())
+			return 0
 		}
 		//return -1, fmt.Errorf("error select %q", err)
 	}
 	if !value.Valid {
-		return -1, fmt.Errorf("invalid id %q", err)
+		return -1
 	}
 
-	return int(value.Int64), nil
+	return int(value.Int64)
 }
 
 func (m *Storage) GetOrderAnotherUser(order string) (string, error) {
