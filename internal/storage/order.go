@@ -3,6 +3,7 @@ package storagedb
 import (
 	"database/sql"
 	"fmt"
+	"sort"
 	"time"
 
 	"github.com/andromaril/gophermmart/internal/errormart"
@@ -77,6 +78,7 @@ func (m *Storage) GetAllOrders(login string) ([]model.Order, error) {
 		}
 		result = append(result, model.Order{Number: number, Status: status, Accrual: accrual, UploadedAt: uploadedat})
 	}
+	SortOrdersTime(result)
 	err = rows.Err()
 	if err != nil {
 		e := errormart.NewMartError(err)
@@ -140,4 +142,10 @@ func (m *Storage) GetUserLogin(number string) (string, error) {
 	}
 
 	return value.String, nil
+}
+
+func SortOrdersTime(orders []model.Order) {
+	sort.Slice(orders, func(i, j int) bool {
+		return orders[i].UploadedAt.After(orders[j].UploadedAt)
+	})
 }
