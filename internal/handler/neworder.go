@@ -5,7 +5,9 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/andromaril/gophermmart/internal/errormart"
 	storagedb "github.com/andromaril/gophermmart/internal/storage"
+	log "github.com/sirupsen/logrus"
 	"github.com/theplant/luhn"
 )
 
@@ -29,15 +31,15 @@ func NewOrder(m storagedb.Storage) http.HandlerFunc {
 				res.WriteHeader(http.StatusOK)
 				return
 			}
-			orderexist2, _ := m.GetOrderAnotherUser(number)
+			orderexist2 := m.GetOrderAnotherUser(number)
 			if orderexist2 != "" && orderexist2 != cookie.Value {
 				res.WriteHeader(http.StatusConflict)
 				return
 			}
 			err := m.NewOrder(cookie.Value, number)
 			if err != nil {
-				// f := fmt.Sprint("%q", err)
-				// res.Write([]byte(f))
+				e := errormart.NewMartError(err)
+				log.Error(e.Error())
 				res.WriteHeader(http.StatusInternalServerError)
 				return
 			}

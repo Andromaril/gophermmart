@@ -37,18 +37,21 @@ func (m *Storage) GetOrderUser(login string, order string) int {
 	return int(value.Int64)
 }
 
-func (m *Storage) GetOrderAnotherUser(order string) (string, error) {
+func (m *Storage) GetOrderAnotherUser(order string) string {
 	var value sql.NullString
 
-	rows2 := m.DB.QueryRowContext(m.Ctx, "SELECT login FROM orders WHERE number=$1", order)
-	err2 := rows2.Scan(&value)
-	if err2 != nil {
-		return "", fmt.Errorf("error select %q", err2)
+	rows := m.DB.QueryRowContext(m.Ctx, "SELECT login FROM orders WHERE number=$1", order)
+	err := rows.Scan(&value)
+	if err != nil {
+		e := errormart.NewMartError(err)
+		log.Error(e.Error())
+		return ""
 	}
 	if !value.Valid {
-		return "", fmt.Errorf("invalid login %q", err2)
+		log.Error("invalid login")
+		return ""
 	}
-	return value.String, nil
+	return value.String
 }
 
 func (m *Storage) GetAllOrders(login string) ([]model.Order, error) {
