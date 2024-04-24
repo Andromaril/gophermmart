@@ -3,13 +3,10 @@ package main
 import (
 	"context"
 	"database/sql"
-	"log"
 	"net/http"
 	"time"
 
 	"github.com/go-chi/chi"
-	"github.com/go-resty/resty/v2"
-	"go.uber.org/zap"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 
@@ -25,25 +22,25 @@ func Update(newdb *storagedb.Storage) {
 		err1 := accrual.Accrual(newdb)
 
 		if err1 != nil {
-			sugar.Infow("Not starting")
+			//sugar.Infow("Not starting")
 		}
 		time.Sleep(time.Second * 5)
 	}
 }
 
-var sugar zap.SugaredLogger
+//var sugar zap.SugaredLogger
 
 func main() {
 	var err error
 	//var storage storagedb.Storage
 	flag.ParseFlags()
-	logger, err2 := zap.NewDevelopment()
-	if err2 != nil {
-		panic(err2)
-	}
-	defer logger.Sync()
-	sugar = *logger.Sugar()
-	sugar.Infow("Starting server")
+	//logger, err2 := zap.NewDevelopment()
+	// if err2 != nil {
+	// 	panic(err2)
+	// }
+	//defer logger.Sync()
+	//sugar = *logger.Sugar()
+	//sugar.Infow("Starting server")
 	var newdb storagedb.Storage
 	var db *sql.DB
 	//if flag.Databaseflag != "" {
@@ -53,11 +50,11 @@ func main() {
 	}
 	//go accrual.Accrual(&newdb)
 	defer db.Close()
-	log.Println(flag.BonusAddress)
-	client := resty.New()
+	//log.Println(flag.BonusAddress)
+	//client := resty.New()
 	//response, err2 := client.R().Get(client.BaseURL + "/api/orders/" + order.Number)
-	response, err2 := client.R().Get(flag.BonusAddress)
-	log.Println(response)
+	//response, err2 := client.R().Get(flag.BonusAddress)
+	//log.Println(response)
 	//}
 	//defer db.Close()
 	//}
