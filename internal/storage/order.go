@@ -44,11 +44,11 @@ func (m *Storage) GetOrderAnotherUser(order string) string {
 	err := rows.Scan(&value)
 	if err != nil {
 		e := errormart.NewMartError(err)
-		log.Error(e.Error())
+		log.Error("error in select in orders db ",e.Error())
 		return ""
 	}
 	if !value.Valid {
-		log.Error("invalid login")
+		log.Error("error in select in orders db: invalid login")
 		return ""
 	}
 	return value.String

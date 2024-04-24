@@ -17,14 +17,14 @@ func GetBalance(m storagedb.Storage) http.HandlerFunc {
 		log.Info("Current from user now: ", result.Current)
 		if err != nil {
 			e := errormart.NewMartError(err)
-			log.Error(e.Error())
+			log.Error("error in select current, withdrawn from balances bd ", e.Error())
 			res.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 		body, err1 := json.Marshal(result)
 		if err1 != nil {
 			e := errormart.NewMartError(err)
-			log.Error(e.Error())
+			log.Error("error in marshal model.Balance ", e.Error())
 			res.WriteHeader(http.StatusInternalServerError)
 			return
 		}

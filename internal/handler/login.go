@@ -20,12 +20,12 @@ func Login(m storagedb.Storage) http.HandlerFunc {
 		dec := json.NewDecoder(req.Body)
 		if err := dec.Decode(&user); err != nil {
 			e := errormart.NewMartError(err)
-			log.Error(e.Error())
+			log.Error("error in decode request body from login ", e.Error())
 			res.WriteHeader(http.StatusBadRequest)
 			return
 		}
 		if user.Login == "" || user.Password == "" {
-			log.Error("invalid registration data")
+			log.Error("invalid login data, empty login or password")
 			res.WriteHeader(http.StatusBadRequest)
 			return
 		}
@@ -34,7 +34,7 @@ func Login(m storagedb.Storage) http.HandlerFunc {
 		value, err1 := m.GetUserPassword(user.Login)
 		if err1 != nil {
 			e := errormart.NewMartError(err1)
-			log.Error(e.Error())
+			log.Error("error in select password from users bd ", e.Error())
 			res.WriteHeader(http.StatusInternalServerError)
 			return
 		}

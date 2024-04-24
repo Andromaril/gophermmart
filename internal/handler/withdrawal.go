@@ -2,13 +2,13 @@ package handler
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
-	"strconv"
 
+	"github.com/andromaril/gophermmart/internal/errormart"
 	"github.com/andromaril/gophermmart/internal/model"
 	storagedb "github.com/andromaril/gophermmart/internal/storage"
-	"github.com/theplant/luhn"
+	"github.com/andromaril/gophermmart/internal/utils"
+	log "github.com/sirupsen/logrus"
 )
 
 func GetWithdrawal(m storagedb.Storage) http.HandlerFunc {
@@ -18,8 +18,8 @@ func GetWithdrawal(m storagedb.Storage) http.HandlerFunc {
 		res.Header().Set("Content-Type", "application/json")
 		result, err := m.GetWithdrawal(cookie.Value)
 		if err != nil {
-			// f := fmt.Sprint("%q", err)
-			// res.Write([]byte(f))
+			e := errormart.NewMartError(err)
+			log.Error("error in select number, sum, processed_at from withdrawals bd ", e.Error())
 			res.WriteHeader(http.StatusInternalServerError)
 			return
 		}
@@ -32,6 +32,8 @@ func GetWithdrawal(m storagedb.Storage) http.HandlerFunc {
 		}
 		enc := json.NewEncoder(res)
 		if err := enc.Encode(r); err != nil {
+			e := errormart.NewMartError(err)
+			log.Error("error in encode model.Withdrawn ", e.Error())
 			return
 		}
 		res.WriteHeader(http.StatusOK)
@@ -43,29 +45,28 @@ func NewWithdrawal(m storagedb.Storage) http.HandlerFunc {
 		var r model.Withdrawn
 		dec := json.NewDecoder(req.Body)
 		if err := dec.Decode(&r); err != nil {
+			e := errormart.NewMartError(err)
+			log.Error("error in decode request body from withdrawal ", e.Error())
 			res.WriteHeader(http.StatusBadRequest)
 			return
 		}
 		cookie, _ := req.Cookie("Login")
-		number, _ := strconv.Atoi(r.Order)
-		validnumer := luhn.Valid(number)
-		// _, err1 := m.GetOrderUser(cookie.Value, int(number))
-		// if err1 != nil {
-		// 	//res.Write([]byte(cookie.Value))
-		// 	log.Printf("%q", err1)
-		// 	res.WriteHeader(http.StatusUnprocessableEntity)
-		// 	return
-		// }
+		validnumer, err2 := utils.ValidLuhn(r.Order)
+		if err2 != nil {
+			e := errormart.NewMartError(err2)
+			log.Error("error in valid luhn order number ", e.Error())
+			res.WriteHeader(http.StatusInternalServerError)
+			return
+		}
 		if validnumer {
 			err := m.UpdateBalance(cookie.Value, r)
 			if err != nil {
-				// f := fmt.Sprint("%q", err)
-				// res.Write([]byte(f))
+				e := errormart.NewMartError(err2)
+				log.Error("error update withdrawals and balances bd ", e.Error())
 				if err == storagedb.ErrNotBalance {
 					res.WriteHeader(http.StatusPaymentRequired)
 					return
 				}
-				log.Printf("%q", err)
 				res.WriteHeader(http.StatusInternalServerError)
 				return
 			}

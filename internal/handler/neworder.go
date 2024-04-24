@@ -3,12 +3,11 @@ package handler
 import (
 	"io"
 	"net/http"
-	"strconv"
 
 	"github.com/andromaril/gophermmart/internal/errormart"
 	storagedb "github.com/andromaril/gophermmart/internal/storage"
+	"github.com/andromaril/gophermmart/internal/utils"
 	log "github.com/sirupsen/logrus"
-	"github.com/theplant/luhn"
 )
 
 func NewOrder(m storagedb.Storage) http.HandlerFunc {
@@ -18,13 +17,19 @@ func NewOrder(m storagedb.Storage) http.HandlerFunc {
 		cookie, _ := req.Cookie("Login")
 		requestData, err1 := io.ReadAll(req.Body)
 		if err1 != nil {
-			//res.Write([]byte(requestData))
+			e := errormart.NewMartError(err1)
+			log.Error("error in read request data from order ", e.Error())
 			res.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 		number := string(requestData)
-		number2, _ := strconv.Atoi(number)
-		validnumer := luhn.Valid(number2)
+		validnumer, err2 := utils.ValidLuhn(number)
+		if err2 != nil {
+			e := errormart.NewMartError(err2)
+			log.Error("error in valid luhn order number ", e.Error())
+			res.WriteHeader(http.StatusInternalServerError)
+			return
+		}
 		if validnumer {
 			orderexist := m.GetOrderUser(cookie.Value, number)
 			if orderexist != 0 {
@@ -39,7 +44,7 @@ func NewOrder(m storagedb.Storage) http.HandlerFunc {
 			err := m.NewOrder(cookie.Value, number)
 			if err != nil {
 				e := errormart.NewMartError(err)
-				log.Error(e.Error())
+				log.Error("error in insert new order into orders bd ", e.Error())
 				res.WriteHeader(http.StatusInternalServerError)
 				return
 			}

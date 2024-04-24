@@ -18,7 +18,7 @@ func GetOrder(m storagedb.Storage) http.HandlerFunc {
 		result, err := m.GetAllOrders(cookie.Value)
 		if err != nil {
 			e := errormart.NewMartError(err)
-			log.Error(e.Error())
+			log.Error("error in select all orders from orders bd ", e.Error())
 			res.WriteHeader(http.StatusInternalServerError)
 			return
 		}
@@ -32,7 +32,7 @@ func GetOrder(m storagedb.Storage) http.HandlerFunc {
 		enc := json.NewEncoder(res)
 		if err := enc.Encode(r); err != nil {
 			e := errormart.NewMartError(err)
-			log.Error(e.Error())
+			log.Error("error in encode model.Order ", e.Error())
 			return
 		}
 	}
