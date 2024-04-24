@@ -48,7 +48,7 @@ func Accrual(storage *storagedb.Storage) error {
 		}
 		if updateorder.Accrual != nil {
 			err5 := storage.UpdateBalanceAccrual(updateorder.Number, updateorder.Accrual)
-			log.Info(updateorder.Number, updateorder.Accrual)
+			log.Info("update order wuth number", updateorder.Number)
 			if err5 != nil {
 				e := errormart.NewMartError(err5)
 				log.Error(e.Error())
