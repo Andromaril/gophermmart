@@ -31,7 +31,7 @@ func NewOrder(m storagedb.Storage) http.HandlerFunc {
 			return
 		}
 		if validnumer {
-			orderexist, _ := m.GetOrderUser(cookie.Value, number)
+			orderexist, err1 := m.GetOrderUser(cookie.Value, number)
 			if err1 != nil && orderexist == -1 {
 				e := errormart.NewMartError(err1)
 				log.Error(e.Error())
@@ -49,7 +49,7 @@ func NewOrder(m storagedb.Storage) http.HandlerFunc {
 				res.WriteHeader(http.StatusInternalServerError)
 				return
 			}
-			if orderexist2 != "" && orderexist2 != cookie.Value {
+			if orderexist2 != "" && orderexist2 != "error" && orderexist2 != cookie.Value {
 				res.WriteHeader(http.StatusConflict)
 				return
 			}
