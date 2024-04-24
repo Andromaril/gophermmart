@@ -9,7 +9,7 @@ import (
 	"github.com/andromaril/gophermmart/internal/model"
 )
 
-var ErrNotBalance = errors.New("malo!!!")
+var ErrNotBalance = errors.New("insufficient number of points to be deducted")
 
 func (m *Storage) GetWithdrawal(login string) ([]model.Withdrawn, error) {
 	result := make([]model.Withdrawn, 0)
@@ -33,6 +33,11 @@ func (m *Storage) GetWithdrawal(login string) ([]model.Withdrawn, error) {
 		}
 
 		result = append(result, model.Withdrawn{Order: order, Sum: sum, ProcessedAt: processedat})
+	}
+	err = rows.Err()
+	if err != nil {
+		e := errormart.NewMartError(err)
+		return result, fmt.Errorf("error select %q", e.Error())
 	}
 	return result, nil
 }
