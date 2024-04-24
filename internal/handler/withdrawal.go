@@ -73,6 +73,5 @@ func NewWithdrawal(m storagedb.Storage) http.HandlerFunc {
 		} else {
 			res.WriteHeader(http.StatusUnprocessableEntity)
 		}
-		res.WriteHeader(http.StatusOK)
 	}
 }

@@ -2,10 +2,11 @@ package verification
 
 import (
 	"fmt"
-	"log"
 	"time"
 
+	"github.com/andromaril/gophermmart/internal/errormart"
 	"github.com/golang-jwt/jwt/v4"
+	log "github.com/sirupsen/logrus"
 )
 
 // Claims — структура утверждений, которая включает стандартные утверждения
@@ -27,25 +28,20 @@ func main() {
 	fmt.Println(tokenString)
 }
 
-// BuildJWTString создаёт токен и возвращает его в виде строки.
 func BuildJWTString() (string, error) {
-	// создаём новый токен с алгоритмом подписи HS256 и утверждениями — Claims
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, Claims{
 		RegisteredClaims: jwt.RegisteredClaims{
-			// когда создан токен
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(TOKEN_EXP)),
 		},
-		// собственное утверждение
 		UserID: 1,
 	})
 
-	// создаём строку токена
 	tokenString, err := token.SignedString([]byte(SECRET_KEY))
 	if err != nil {
-		return "", err
+		e := errormart.NewMartError(err)
+		return "", fmt.Errorf("error %q", e.Error())
 	}
 
-	// возвращаем строку токена
 	return tokenString, nil
 }
 
@@ -56,14 +52,13 @@ func GetUserID(tokenString string) int {
 			return []byte(SECRET_KEY), nil
 		})
 	if err != nil {
+		e := errormart.NewMartError(err)
+		log.Error(e.Error())
 		return -1
 	}
 
 	if !token.Valid {
-		fmt.Println("Token is not valid")
 		return -1
 	}
-
-	fmt.Println("Token is valid")
 	return claims.UserID
 }

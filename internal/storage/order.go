@@ -85,48 +85,6 @@ func (m *Storage) GetAllOrders(login string) ([]model.Order, error) {
 	return result, nil
 }
 
-// func (m *Storage) getOrderId(number string) (int, error) {
-// 	var value sql.NullInt64
-// 	row := m.DB.QueryRowContext(m.Ctx, "SELECT id FROM orders WHERE number = $1", number)
-// 	err := row.Scan(&value)
-// 	if err != nil {
-// 		return 0, fmt.Errorf("error select %q", err)
-// 	}
-// 	if !value.Valid {
-// 		return 0, fmt.Errorf("invalid login %q", err)
-// 	}
-
-// 	return int(value.Int64), nil
-// }
-
-// func (m *Storage) GetAccural(number string) (float64, error) {
-// 	var value sql.NullFloat64
-// 	row := m.DB.QueryRowContext(m.Ctx, "SELECT accrual FROM orders WHERE number = $1", number)
-// 	err := row.Scan(&value)
-// 	if err != nil {
-// 		return 0, fmt.Errorf("error select %q", err)
-// 	}
-// 	if !value.Valid {
-// 		return 0, fmt.Errorf("invalid login %q", err)
-// 	}
-
-// 	return value.Float64, nil
-// }
-
-// func (m *Storage) GetAccural(login string) (float64, error) {
-// 	var value sql.NullFloat64
-// 	row := m.DB.QueryRowContext(m.Ctx, "SELECT accrual FROM orders WHERE login = $1", login)
-// 	err := row.Scan(&value)
-// 	if err != nil {
-// 		return 0, fmt.Errorf("error select %q", err)
-// 	}
-// 	if !value.Valid {
-// 		return 0, fmt.Errorf("invalid login %q", err)
-// 	}
-
-// 	return value.Float64, nil
-// }
-
 func (m *Storage) GetAccrualOrders() ([]model.Order, error) {
 	result := make([]model.Order, 0)
 	rows, err := m.DB.QueryContext(m.Ctx, "SELECT number, status, accrual, uploadedat FROM orders WHERE status = 'NEW' OR status = 'PROCESSING'")
@@ -135,10 +93,7 @@ func (m *Storage) GetAccrualOrders() ([]model.Order, error) {
 		return result, fmt.Errorf("error select %q", e.Error())
 	}
 
-	// обязательно закрываем перед возвратом функции
 	defer rows.Close()
-
-	// пробегаем по всем записям
 	for rows.Next() {
 		var (
 			number     string

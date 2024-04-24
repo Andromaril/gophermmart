@@ -18,12 +18,14 @@ func (m *Storage) Init(path string, ctx context.Context) (*sql.DB, error) {
 	m.Ctx = ctx
 	m.DB, err = sql.Open("pgx", path)
 	if err != nil {
-		return nil, fmt.Errorf("fatal start a transaction %q", err)
+		e := errormart.NewMartError(err)
+		return nil, fmt.Errorf("fatal start a transaction %q", e.Error())
 	}
 
 	err3 := m.Bootstrap(m.Ctx)
 	if err3 != nil {
-		return nil, fmt.Errorf("fatal start a transaction %q", err3)
+		e := errormart.NewMartError(err3)
+		return nil, fmt.Errorf("fatal start a transaction %q", e.Error())
 	}
 	return m.DB, nil
 
