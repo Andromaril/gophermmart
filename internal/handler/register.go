@@ -31,14 +31,8 @@ func Register(m storagedb.Storage) http.HandlerFunc {
 		}
 		hash := md5.Sum([]byte(user.Password))
 		hashedPass := hex.EncodeToString(hash[:])
-		value, err2 := m.GetUser(user.Login)
-		if err2 != nil {
-			e := errormart.NewMartError(err2)
-			log.Error("error in select user id from users bd ", e.Error())
-			res.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-		if value != "" {
+		value := m.GetUser(user.Login)
+		if value == 0 {
 			res.WriteHeader(http.StatusConflict)
 			return
 		}

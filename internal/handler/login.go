@@ -31,10 +31,8 @@ func Login(m storagedb.Storage) http.HandlerFunc {
 		}
 		hash := md5.Sum([]byte(user.Password))
 		hashedPass := hex.EncodeToString(hash[:])
-		value, err1 := m.GetUserPassword(user.Login)
-		if err1 != nil {
-			e := errormart.NewMartError(err1)
-			log.Error("error in select password from users bd ", e.Error())
+		value := m.GetUserPassword(user.Login)
+		if value == "" {
 			res.WriteHeader(http.StatusInternalServerError)
 			return
 		}

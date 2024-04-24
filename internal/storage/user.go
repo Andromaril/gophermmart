@@ -3,6 +3,9 @@ package storagedb
 import (
 	"database/sql"
 	"fmt"
+
+	"github.com/andromaril/gophermmart/internal/errormart"
+	log "github.com/sirupsen/logrus"
 )
 
 func (m *Storage) NewUser(login string, password string) error {
@@ -15,28 +18,34 @@ func (m *Storage) NewUser(login string, password string) error {
 	return nil
 }
 
-func (m *Storage) GetUser(login string) (string, error) {
-	var value sql.NullString
+func (m *Storage) GetUser(login string) int {
+	var value sql.NullInt64
 	rows := m.DB.QueryRowContext(m.Ctx, "SELECT id FROM users WHERE login=$1", login)
 	err := rows.Scan(&value)
 	if err != nil {
-		return "", fmt.Errorf("error select %q", err)
+		e := errormart.NewMartError(err)
+		log.Error("error in select user id in user bd ", e.Error())
+		return 0
 	}
 	if !value.Valid {
-		return "", fmt.Errorf("invalid login %q", err)
+		log.Error("error in select in users bd: invalid user id")
+		return 0
 	}
-	return value.String, nil
+	return int(value.Int64)
 }
 
-func (m *Storage) GetUserPassword(login string) (string, error) {
+func (m *Storage) GetUserPassword(login string) string {
 	var value sql.NullString
 	rows := m.DB.QueryRowContext(m.Ctx, "SELECT password FROM users WHERE login=$1", login)
 	err := rows.Scan(&value)
 	if err != nil {
-		return "", fmt.Errorf("error select %q", err)
+		e := errormart.NewMartError(err)
+		log.Error("error in select password in user bd ", e.Error())
+		return ""
 	}
 	if !value.Valid {
-		return "", fmt.Errorf("invalid login %q", err)
+		log.Error("error in select in users bd: invalid password")
+		return ""
 	}
-	return value.String, nil
+	return value.String
 }
