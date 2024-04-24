@@ -14,7 +14,7 @@ func GetBalance(m storagedb.Storage) http.HandlerFunc {
 		cookie, _ := req.Cookie("Login")
 		res.Header().Set("Content-Type", "application/json")
 		result, err := m.GetBalance(cookie.Value)
-		log.Info("Current and withdrawn from user now:", result.Current, result.Withdrawn, cookie.Value)
+		log.Info("Current from user now: ", result.Current)
 		if err != nil {
 			e := errormart.NewMartError(err)
 			log.Error(e.Error())

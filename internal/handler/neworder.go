@@ -3,10 +3,11 @@ package handler
 import (
 	"io"
 	"net/http"
-	"strconv"
 
+	"github.com/andromaril/gophermmart/internal/errormart"
 	storagedb "github.com/andromaril/gophermmart/internal/storage"
-	"github.com/theplant/luhn"
+	"github.com/andromaril/gophermmart/internal/utils"
+	log "github.com/sirupsen/logrus"
 )
 
 func NewOrder(m storagedb.Storage) http.HandlerFunc {
@@ -16,29 +17,46 @@ func NewOrder(m storagedb.Storage) http.HandlerFunc {
 		cookie, _ := req.Cookie("Login")
 		requestData, err1 := io.ReadAll(req.Body)
 		if err1 != nil {
-			//res.Write([]byte(requestData))
+			e := errormart.NewMartError(err1)
+			log.Error(e.Error())
 			res.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 		number := string(requestData)
-		number2, _ := strconv.Atoi(number)
-		validnumer := luhn.Valid(number2)
+		validnumer, err2 := utils.ValidLuhn(number)
+		if err2 != nil {
+			e := errormart.NewMartError(err2)
+			log.Error(e.Error())
+			res.WriteHeader(http.StatusInternalServerError)
+			return
+		}
 		if validnumer {
-			orderexist, _ := m.GetOrderUser(cookie.Value, number)
+			orderexist, err1 := m.GetOrderUser(cookie.Value, number)
+			if err1 != nil {
+				e := errormart.NewMartError(err1)
+				log.Error(e.Error())
+				res.WriteHeader(http.StatusInternalServerError)
+				return
+			}
 			if orderexist != 0 {
-				//res.Write([]byte(cookie.Value))
 				res.WriteHeader(http.StatusOK)
 				return
 			}
-			orderexist2, _ := m.GetOrderAnotherUser(number)
+			orderexist2, err2 := m.GetOrderAnotherUser(number)
+			if err2 != nil {
+				e := errormart.NewMartError(err2)
+				log.Error(e.Error())
+				res.WriteHeader(http.StatusInternalServerError)
+				return
+			}
 			if orderexist2 != "" && orderexist2 != cookie.Value {
 				res.WriteHeader(http.StatusConflict)
 				return
 			}
 			err := m.NewOrder(cookie.Value, number)
 			if err != nil {
-				// f := fmt.Sprint("%q", err)
-				// res.Write([]byte(f))
+				e := errormart.NewMartError(err2)
+				log.Error(e.Error())
 				res.WriteHeader(http.StatusInternalServerError)
 				return
 			}
