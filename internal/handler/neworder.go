@@ -5,9 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/andromaril/gophermmart/internal/errormart"
 	storagedb "github.com/andromaril/gophermmart/internal/storage"
-	log "github.com/sirupsen/logrus"
 	"github.com/theplant/luhn"
 )
 

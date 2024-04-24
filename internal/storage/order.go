@@ -34,7 +34,7 @@ func (m *Storage) GetOrderUser(login string, order string) int {
 		return 0
 	}
 
-	return int(value.Int64), nil
+	return int(value.Int64)
 }
 
 func (m *Storage) GetOrderAnotherUser(order string) (string, error) {
