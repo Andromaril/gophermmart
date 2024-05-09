@@ -7,7 +7,6 @@ import (
 
 	"github.com/andromaril/gophermmart/internal/errormart"
 	"github.com/andromaril/gophermmart/internal/model"
-	"github.com/jackc/pgx/v4"
 )
 
 var ErrNotRow = errors.New("no balances, new user")
@@ -29,7 +28,7 @@ func (m *Storage) GetBalance(login string) (model.Balance, error) {
 	// 	e := errormart.NewMartError(err)
 	// 	return model.Balance{}, fmt.Errorf("error select %q", e.Error())
 	// }
-	if errors.Is(err, pgx.ErrNoRows) {
+	if errors.Is(err, sql.ErrNoRows) {
 		return model.Balance{0, 0}, ErrNotRow
 	}
 	result = model.Balance{current.Float64, withdrawn.Float64}
