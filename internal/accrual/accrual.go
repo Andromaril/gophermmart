@@ -13,6 +13,7 @@ import (
 )
 
 func Accrual(storage *storagedb.Storage) error {
+	var err error
 	orders, err := storage.GetAccrualOrders()
 	if err != nil {
 		e := errormart.NewMartError(err)
@@ -22,35 +23,34 @@ func Accrual(storage *storagedb.Storage) error {
 	client := resty.New()
 	for _, order := range orders {
 		var updateorder model.UpdateOrder
-		//client := resty.New()
 		url := fmt.Sprintf("%s/api/orders/%s", flag.BonusAddress, order.Number)
-		response, err2 := client.R().Get(url)
+		response, err := client.R().Get(url)
 		log.Info(response)
-		if err2 != nil {
+		if err != nil {
 			e := errormart.NewMartError(err)
 			log.Error(e.Error())
 			return fmt.Errorf("error %q", e.Error())
 		}
-		err3 := json.Unmarshal(response.Body(), &updateorder)
-		if err3 != nil {
+		err = json.Unmarshal(response.Body(), &updateorder)
+		if err != nil {
 			e := errormart.NewMartError(err)
 			log.Error(e.Error())
 			return fmt.Errorf("error %q", e.Error())
 		}
 
 		if updateorder.Status != "REGISTERED" {
-			err4 := storage.UpdateOrderAccrual(updateorder.Accrual, updateorder.Status, updateorder.Number)
-			if err4 != nil {
+			err = storage.UpdateOrderAccrual(updateorder.Accrual, updateorder.Status, updateorder.Number)
+			if err != nil {
 				e := errormart.NewMartError(err)
 				log.Error(e.Error())
 				return fmt.Errorf("error %q", e.Error())
 			}
 		}
 		if updateorder.Accrual != nil {
-			err5 := storage.UpdateBalanceAccrual(updateorder.Number, updateorder.Accrual)
+			err = storage.UpdateBalanceAccrual(updateorder.Number, updateorder.Accrual)
 			log.Info("update order from accrual with number ", updateorder.Number)
-			if err5 != nil {
-				e := errormart.NewMartError(err5)
+			if err != nil {
+				e := errormart.NewMartError(err)
 				log.Error(e.Error())
 				return fmt.Errorf("error %q", e.Error())
 			}
