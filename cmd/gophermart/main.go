@@ -47,16 +47,27 @@ func NewRouter(newdb storagedb.Storage) {
 	}
 	//return r
 }
-
-func main() {
+func Start() (*sql.DB, storagedb.Storage) {
 	var err error
-	flag.ParseFlags()
 	var newdb storagedb.Storage
 	var db *sql.DB
 	db, err = newdb.Init(flag.Databaseflag, context.Background())
 	if err != nil {
 		panic(err)
 	}
+	return db, newdb
+}
+
+func main() {
+	//var err error
+	flag.ParseFlags()
+	// var newdb storagedb.Storage
+	// var db *sql.DB
+	// db, err = newdb.Init(flag.Databaseflag, context.Background())
+	// if err != nil {
+	// 	panic(err)
+	// }
+	db, newdb := Start()
 	defer db.Close()
 	go Update(&newdb)
 	// r := chi.NewRouter()
