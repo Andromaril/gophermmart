@@ -15,19 +15,19 @@ func (m *Storage) GetBalance(login string) (model.Balance, error) {
 		return model.Balance{}, fmt.Errorf("error select %q", e.Error())
 	}
 
-	defer rows.Close()
-	for rows.Next() {
-		err = rows.Scan(&result.Current, &result.Withdrawn)
-		if err != nil {
-			e := errormart.NewMartError(err)
-			return model.Balance{}, fmt.Errorf("error select %q", e.Error())
-		}
-	}
-	err = rows.Err()
+	//defer rows.Close()
+	//for rows.Next() {
+	err = rows.Scan(&result.Current, &result.Withdrawn)
 	if err != nil {
 		e := errormart.NewMartError(err)
 		return model.Balance{}, fmt.Errorf("error select %q", e.Error())
 	}
+	//}
+	// err = rows.Err()
+	// if err != nil {
+	// 	e := errormart.NewMartError(err)
+	// 	return model.Balance{}, fmt.Errorf("error select %q", e.Error())
+	// }
 	return result, nil
 }
 
