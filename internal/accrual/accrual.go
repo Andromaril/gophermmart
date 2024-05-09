@@ -19,10 +19,10 @@ func Accrual(storage *storagedb.Storage) error {
 		log.Error(e.Error())
 		return fmt.Errorf("error %q", e.Error())
 	}
-
+	client := resty.New()
 	for _, order := range orders {
 		var updateorder model.UpdateOrder
-		client := resty.New()
+		//client := resty.New()
 		url := fmt.Sprintf("%s/api/orders/%s", flag.BonusAddress, order.Number)
 		response, err2 := client.R().Get(url)
 		log.Info(response)
