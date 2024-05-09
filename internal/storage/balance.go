@@ -25,11 +25,14 @@ func (m *Storage) GetBalance(login string) (model.Balance, error) {
 	//rows.Next()
 	err := rows.Scan(current, withdrawn)
 	// if err != nil {
-	// 	e := errormart.NewMartError(err)
+	//
 	// 	return model.Balance{}, fmt.Errorf("error select %q", e.Error())
 	// }
 	if errors.Is(err, sql.ErrNoRows) {
 		return model.Balance{0, 0}, ErrNotRow
+	} else if err != nil {
+		e := errormart.NewMartError(err)
+		return model.Balance{}, fmt.Errorf("error select %q", e.Error())
 	}
 	result = model.Balance{current.Float64, withdrawn.Float64}
 	//}
