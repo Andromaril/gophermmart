@@ -7,6 +7,7 @@ import (
 
 	"github.com/andromaril/gophermmart/internal/errormart"
 	"github.com/andromaril/gophermmart/internal/model"
+	log "github.com/sirupsen/logrus"
 )
 
 var ErrNotRow = errors.New("no balances, new user")
@@ -16,47 +17,26 @@ func (m *Storage) GetBalance(login string) (model.Balance, error) {
 	var current sql.NullFloat64
 	var withdrawn sql.NullFloat64
 	rows := m.DB.QueryRowContext(m.Ctx, "SELECT current, withdrawn FROM balances WHERE login=$1", login)
-	// if err != nil {
-	// 	e := errormart.NewMartError(err)
-	// 	return model.Balance{}, fmt.Errorf("error select %q", e.Error())
-	// }
-
-	//defer rows.Close()
-	//rows.Next()
 	err := rows.Scan(&current, &withdrawn)
-	// if err != nil {
-	//
-	// 	return model.Balance{}, fmt.Errorf("error select %q", e.Error())
-	// }
+
 	if errors.Is(err, sql.ErrNoRows) {
 		return model.Balance{0, 0}, ErrNotRow
 	} else if err != nil {
 		e := errormart.NewMartError(err)
 		return model.Balance{}, fmt.Errorf("error select %q", e.Error())
 	}
-	result = model.Balance{current.Float64, withdrawn.Float64}
-	//}
-	// err = rows.Err()
-	// if err != nil {
-	// 	e := errormart.NewMartError(err)
-	// 	return model.Balance{}, fmt.Errorf("error select %q", e.Error())
-	// err := rows.Scan(&current, &withdrawn)
-	// if err != nil {
-	// 	e := errormart.NewMartError(err)
-	// 	log.Error("error in select in orders db ", e.Error())
-	// 	return 0, 0
-	// }
-	// if !current.Valid {
-	// 	log.Error("error in select in orders db: invalid login")
-	// 	return 0, 0
-	// }
-	// if !withdrawn.Valid {
-	// 	log.Error("error in select in orders db: invalid login")
-	// 	return 0,0
-	// }
+
+	if !current.Valid {
+		log.Error("error in select in orders db: invalid login")
+		return model.Balance{}, fmt.Errorf("error in select in balances db: invalid current")
+	}
+	if !withdrawn.Valid {
+		log.Error("error in select in orders db: invalid login")
+		return model.Balance{}, fmt.Errorf("error in select in balances db: invalid withdrawn")
+	}
+	
+	result = model.Balance{Current: current.Float64, Withdrawn: withdrawn.Float64}
 	return result, nil
-	// }
-	//return result, nil
 }
 
 func (m *Storage) UpdateBalanceAccrual(number string, accrual *float64) error {
