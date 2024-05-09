@@ -13,6 +13,7 @@ var ErrNotBalance = errors.New("insufficient number of points to be deducted")
 
 func (m *Storage) GetWithdrawal(login string) ([]model.Withdrawn, error) {
 	result := make([]model.Withdrawn, 0)
+	var result2 model.Withdrawn
 	rows, err := m.DB.QueryContext(m.Ctx, "SELECT number, sum, processed_at FROM withdrawals WHERE login=$1", login)
 	if err != nil {
 		e := errormart.NewMartError(err)
@@ -21,18 +22,18 @@ func (m *Storage) GetWithdrawal(login string) ([]model.Withdrawn, error) {
 
 	defer rows.Close()
 	for rows.Next() {
-		var (
-			order       string
-			sum         float64
-			processedat time.Time
-		)
-		err = rows.Scan(&order, &sum, &processedat)
+		// var (
+		// 	order       string
+		// 	sum         float64
+		// 	processedat time.Time
+		// )
+		err = rows.Scan(&result2.Order, &result2.Sum, &result2.ProcessedAt)
 		if err != nil {
 			e := errormart.NewMartError(err)
 			return result, fmt.Errorf("error scan %q", e.Error())
 		}
 
-		result = append(result, model.Withdrawn{Order: order, Sum: sum, ProcessedAt: processedat})
+		result = append(result, model.Withdrawn{Order: result2.Order, Sum: result2.Sum, ProcessedAt: result2.ProcessedAt})
 	}
 	err = rows.Err()
 	if err != nil {
