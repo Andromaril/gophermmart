@@ -9,15 +9,17 @@ import (
 
 func (m *Storage) GetBalance(login string) (model.Balance, error) {
 	result := model.Balance{}
-	rows := m.DB.QueryRowContext(m.Ctx, "SELECT current, withdrawn FROM balances WHERE login=$1", login)
+	// var current sql.NullFloat64
+	// var withdrawn sql.NullFloat64
+	rows, err := m.DB.QueryContext(m.Ctx, "SELECT current, withdrawn FROM balances WHERE login=$1", login)
 	// if err != nil {
 	// 	e := errormart.NewMartError(err)
 	// 	return model.Balance{}, fmt.Errorf("error select %q", e.Error())
 	// }
 
-	//defer rows.Close()
-	//for rows.Next() {
-	err := rows.Scan(&result.Current, &result.Withdrawn)
+	defer rows.Close()
+	rows.Next()
+	err = rows.Scan(&result.Current, &result.Withdrawn)
 	if err != nil {
 		e := errormart.NewMartError(err)
 		return model.Balance{}, fmt.Errorf("error select %q", e.Error())
@@ -27,8 +29,23 @@ func (m *Storage) GetBalance(login string) (model.Balance, error) {
 	// if err != nil {
 	// 	e := errormart.NewMartError(err)
 	// 	return model.Balance{}, fmt.Errorf("error select %q", e.Error())
+	// err := rows.Scan(&current, &withdrawn)
+	// if err != nil {
+	// 	e := errormart.NewMartError(err)
+	// 	log.Error("error in select in orders db ", e.Error())
+	// 	return 0, 0
+	// }
+	// if !current.Valid {
+	// 	log.Error("error in select in orders db: invalid login")
+	// 	return 0, 0
+	// }
+	// if !withdrawn.Valid {
+	// 	log.Error("error in select in orders db: invalid login")
+	// 	return 0,0
 	// }
 	return result, nil
+	// }
+	//return result, nil
 }
 
 func (m *Storage) UpdateBalanceAccrual(number string, accrual *float64) error {

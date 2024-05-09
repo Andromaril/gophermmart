@@ -23,7 +23,7 @@ func Update(newdb *storagedb.Storage) {
 
 		if err != nil {
 			e := errormart.NewMartError(err)
-			log.Error("error witg accraul ", e.Error())
+			log.Error("error witg accrual ", e.Error())
 		}
 		time.Sleep(time.Second * 5)
 	}
