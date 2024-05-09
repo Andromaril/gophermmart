@@ -59,13 +59,13 @@ func (m *Storage) GetBalance(login string) (model.Balance, error) {
 
 func (m *Storage) UpdateBalanceAccrual(number string, accrual *float64) error {
 	login, err := m.GetUserLogin(number)
-	if err != ErrNotRow {
+	if err != nil {
 		e := errormart.NewMartError(err)
 		return fmt.Errorf("error select %q", e.Error())
 	}
 
 	result, err := m.GetBalance(login)
-	if err != nil {
+	if err != ErrNotRow {
 		e := errormart.NewMartError(err)
 		return fmt.Errorf("error select %q", e.Error())
 	}
