@@ -2,11 +2,15 @@ package storagedb
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 
 	"github.com/andromaril/gophermmart/internal/errormart"
 	"github.com/andromaril/gophermmart/internal/model"
+	"github.com/jackc/pgx"
 )
+
+var ErrNotRow = errors.New("no balances, new user")
 
 func (m *Storage) GetBalance(login string) (model.Balance, error) {
 	result := model.Balance{}
@@ -21,9 +25,12 @@ func (m *Storage) GetBalance(login string) (model.Balance, error) {
 	//defer rows.Close()
 	//rows.Next()
 	err := rows.Scan(current, withdrawn)
-	if err != nil {
-		e := errormart.NewMartError(err)
-		return model.Balance{}, fmt.Errorf("error select %q", e.Error())
+	// if err != nil {
+	// 	e := errormart.NewMartError(err)
+	// 	return model.Balance{}, fmt.Errorf("error select %q", e.Error())
+	// }
+	if errors.Is(err, pgx.ErrNoRows) {
+		return model.Balance{}, ErrNotRow
 	}
 	result = model.Balance{current.Float64, withdrawn.Float64}
 	//}
@@ -52,7 +59,7 @@ func (m *Storage) GetBalance(login string) (model.Balance, error) {
 
 func (m *Storage) UpdateBalanceAccrual(number string, accrual *float64) error {
 	login, err := m.GetUserLogin(number)
-	if err != nil {
+	if err != ErrNotRow {
 		e := errormart.NewMartError(err)
 		return fmt.Errorf("error select %q", e.Error())
 	}

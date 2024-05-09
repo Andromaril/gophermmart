@@ -11,6 +11,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+
 func (m *Storage) NewOrder(login string, order string) error {
 	_, err := m.DB.ExecContext(m.Ctx, `
 	INSERT INTO orders (login, number, status, uploadedat)
