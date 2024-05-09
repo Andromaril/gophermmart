@@ -40,6 +40,7 @@ func (m *Storage) GetBalance(login string) (model.Balance, error) {
 }
 
 func (m *Storage) UpdateBalanceAccrual(number string, accrual *float64) error {
+	var err error
 	login, err := m.GetUserLogin(number)
 	if err != nil {
 		e := errormart.NewMartError(err)
@@ -56,9 +57,9 @@ func (m *Storage) UpdateBalanceAccrual(number string, accrual *float64) error {
 		Withdrawn: result.Withdrawn,
 	}
 
-	_, err2 := m.DB.ExecContext(m.Ctx, `
+	_, err = m.DB.ExecContext(m.Ctx, `
 	 INSERT INTO balances (login, current, withdrawn) VALUES($1, $2, $3) ON CONFLICT (login) DO UPDATE SET current=$2, withdrawn=$3`, login, balancenew.Current, balancenew.Withdrawn)
-	if err2 != nil {
+	if err != nil {
 		e := errormart.NewMartError(err)
 		return fmt.Errorf("error insert %q", e.Error())
 	}

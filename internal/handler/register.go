@@ -15,10 +15,11 @@ import (
 
 func Register(m storagedb.Storage) http.HandlerFunc {
 	return func(res http.ResponseWriter, req *http.Request) {
+		var err error
 		var user model.User
 		res.Header().Set("Content-Type", "application/json")
 		dec := json.NewDecoder(req.Body)
-		if err := dec.Decode(&user); err != nil {
+		if err = dec.Decode(&user); err != nil {
 			e := errormart.NewMartError(err)
 			log.Error("error in decode request body from register ", e.Error())
 			res.WriteHeader(http.StatusBadRequest)
@@ -36,14 +37,20 @@ func Register(m storagedb.Storage) http.HandlerFunc {
 			res.WriteHeader(http.StatusConflict)
 			return
 		} 
-		err3 := m.NewUser(user.Login, hashedPass)
-		if err3 != nil {
-			e := errormart.NewMartError(err3)
+		err = m.NewUser(user.Login, hashedPass)
+		if err != nil {
+			e := errormart.NewMartError(err)
 			log.Error("error in insert new user into users bd ", e.Error())
 			res.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-		token, _ := verification.BuildJWTString()
+		token, err := verification.BuildJWTString()
+		if err != nil {
+			e := errormart.NewMartError(err)
+			log.Error("error in create token", e.Error())
+			res.WriteHeader(http.StatusInternalServerError)
+			return
+		}
 		cookie := &http.Cookie{
 			Name:   "Token",
 			Value:  token,

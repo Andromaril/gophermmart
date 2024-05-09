@@ -12,20 +12,20 @@ import (
 
 func NewOrder(m storagedb.Storage) http.HandlerFunc {
 	return func(res http.ResponseWriter, req *http.Request) {
-
+		var err error
 		res.Header().Set("Content-Type", "text/plain")
 		cookie, _ := req.Cookie("Login")
-		requestData, err1 := io.ReadAll(req.Body)
-		if err1 != nil {
-			e := errormart.NewMartError(err1)
+		requestData, err := io.ReadAll(req.Body)
+		if err != nil {
+			e := errormart.NewMartError(err)
 			log.Error("error in read request data from order ", e.Error())
 			res.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 		number := string(requestData)
-		validnumer, err2 := utils.ValidLuhn(number)
-		if err2 != nil {
-			e := errormart.NewMartError(err2)
+		validnumer, err := utils.ValidLuhn(number)
+		if err != nil {
+			e := errormart.NewMartError(err)
 			log.Error("error in valid luhn order number ", e.Error())
 			res.WriteHeader(http.StatusInternalServerError)
 			return
@@ -41,7 +41,7 @@ func NewOrder(m storagedb.Storage) http.HandlerFunc {
 				res.WriteHeader(http.StatusConflict)
 				return
 			}
-			err := m.NewOrder(cookie.Value, number)
+			err = m.NewOrder(cookie.Value, number)
 			if err != nil {
 				e := errormart.NewMartError(err)
 				log.Error("error in insert new order into orders bd ", e.Error())

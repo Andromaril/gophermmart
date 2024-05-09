@@ -42,18 +42,19 @@ func GetWithdrawal(m storagedb.Storage) http.HandlerFunc {
 
 func NewWithdrawal(m storagedb.Storage) http.HandlerFunc {
 	return func(res http.ResponseWriter, req *http.Request) {
+		var err error
 		var r model.Withdrawn
 		dec := json.NewDecoder(req.Body)
-		if err := dec.Decode(&r); err != nil {
+		if err = dec.Decode(&r); err != nil {
 			e := errormart.NewMartError(err)
 			log.Error("error in decode request body from withdrawal ", e.Error())
 			res.WriteHeader(http.StatusBadRequest)
 			return
 		}
 		cookie, _ := req.Cookie("Login")
-		validnumer, err2 := utils.ValidLuhn(r.Order)
-		if err2 != nil {
-			e := errormart.NewMartError(err2)
+		validnumer, err := utils.ValidLuhn(r.Order)
+		if err != nil {
+			e := errormart.NewMartError(err)
 			log.Error("error in valid luhn order number ", e.Error())
 			res.WriteHeader(http.StatusInternalServerError)
 			return
@@ -61,7 +62,7 @@ func NewWithdrawal(m storagedb.Storage) http.HandlerFunc {
 		if validnumer {
 			err := m.UpdateBalance(cookie.Value, r)
 			if err != nil {
-				e := errormart.NewMartError(err2)
+				e := errormart.NewMartError(err)
 				log.Error("error update withdrawals and balances bd ", e.Error())
 				if err == storagedb.ErrNotBalance {
 					res.WriteHeader(http.StatusPaymentRequired)

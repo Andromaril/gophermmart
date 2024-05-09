@@ -40,7 +40,13 @@ func Login(m storagedb.Storage) http.HandlerFunc {
 			res.WriteHeader(http.StatusUnauthorized)
 			return
 		}
-		token, _ := verification.BuildJWTString()
+		token, err := verification.BuildJWTString()
+		if err != nil {
+			e := errormart.NewMartError(err)
+			log.Error("error in create token", e.Error())
+			res.WriteHeader(http.StatusInternalServerError)
+			return
+		}
 		cookie := &http.Cookie{
 			Name:   "Token",
 			Value:  token,
