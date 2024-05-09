@@ -67,7 +67,7 @@ func (m *Storage) UpdateBalanceAccrual(number string, accrual *float64) error {
 	result, err := m.GetBalance(login)
 	if err != ErrNotRow {
 		e := errormart.NewMartError(err)
-		return fmt.Errorf("error select %q", e.Error())
+		return fmt.Errorf("error select balance %q", e.Error())
 	}
 	balancenew := model.Balance{
 		Current:   result.Current + *accrual,
