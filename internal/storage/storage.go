@@ -22,9 +22,9 @@ func (m *Storage) Init(path string, ctx context.Context) (*sql.DB, error) {
 		return nil, fmt.Errorf("fatal start a transaction %q", e.Error())
 	}
 
-	err3 := m.Bootstrap(m.Ctx)
-	if err3 != nil {
-		e := errormart.NewMartError(err3)
+	err = m.Bootstrap(m.Ctx)
+	if err != nil {
+		e := errormart.NewMartError(err)
 		return nil, fmt.Errorf("fatal start a transaction %q", e.Error())
 	}
 	return m.DB, nil

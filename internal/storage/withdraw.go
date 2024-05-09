@@ -43,7 +43,13 @@ func (m *Storage) GetWithdrawal(login string) ([]model.Withdrawn, error) {
 }
 
 func (m *Storage) UpdateBalance(login string, withdrawal model.Withdrawn) error {
-
+	var err error
+	tx, err := m.DB.BeginTx(m.Ctx, nil)
+	if err != nil {
+		e := errormart.NewMartError(err)
+		return fmt.Errorf("fatal start a transaction %q", e.Error())
+	}
+	defer tx.Rollback()
 	balance, err := m.GetBalance(login)
 	if err != nil {
 		e := errormart.NewMartError(err)
@@ -57,19 +63,19 @@ func (m *Storage) UpdateBalance(login string, withdrawal model.Withdrawn) error 
 		Withdrawn: balance.Withdrawn + withdrawal.Sum,
 	}
 
-	_, err2 := m.DB.ExecContext(m.Ctx, `
+	_, err = tx.ExecContext(m.Ctx, `
 		UPDATE balances SET current=$1, withdrawn=$2 WHERE login=$3`, balance2.Current, balance2.Withdrawn, login)
-	if err2 != nil {
-		e := errormart.NewMartError(err2)
+	if err != nil {
+		e := errormart.NewMartError(err)
 		return fmt.Errorf("error insert %q", e.Error())
 	}
 
-	_, err3 := m.DB.ExecContext(m.Ctx, `
+	_, err = tx.ExecContext(m.Ctx, `
 	INSERT INTO withdrawals (login, number, sum, processed_at)
 	VALUES ($1, $2, $3, $4)`, login, withdrawal.Order, withdrawal.Sum, withdrawal.ProcessedAt)
-	if err3 != nil {
-		e := errormart.NewMartError(err3)
+	if err != nil {
+		e := errormart.NewMartError(err)
 		return fmt.Errorf("error insert %q", e.Error())
 	}
-	return nil
+	return tx.Commit()
 }

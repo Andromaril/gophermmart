@@ -42,8 +42,8 @@ func NewRouter(newdb storagedb.Storage) {
 		panic(err)
 
 	}
-	//return r
 }
+
 func Start() (*sql.DB, storagedb.Storage) {
 	var err error
 	var newdb storagedb.Storage
