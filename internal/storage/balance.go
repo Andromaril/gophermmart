@@ -23,7 +23,7 @@ func (m *Storage) GetBalance(login string) (model.Balance, error) {
 
 	//defer rows.Close()
 	//rows.Next()
-	err := rows.Scan(current, withdrawn)
+	err := rows.Scan(&current, &withdrawn)
 	// if err != nil {
 	//
 	// 	return model.Balance{}, fmt.Errorf("error select %q", e.Error())
