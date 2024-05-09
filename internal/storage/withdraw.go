@@ -3,7 +3,6 @@ package storagedb
 import (
 	"errors"
 	"fmt"
-	"time"
 
 	"github.com/andromaril/gophermmart/internal/errormart"
 	"github.com/andromaril/gophermmart/internal/model"
@@ -13,7 +12,6 @@ var ErrNotBalance = errors.New("insufficient number of points to be deducted")
 
 func (m *Storage) GetWithdrawal(login string) ([]model.Withdrawn, error) {
 	result := make([]model.Withdrawn, 0)
-	var result2 model.Withdrawn
 	rows, err := m.DB.QueryContext(m.Ctx, "SELECT number, sum, processed_at FROM withdrawals WHERE login=$1", login)
 	if err != nil {
 		e := errormart.NewMartError(err)
@@ -27,6 +25,7 @@ func (m *Storage) GetWithdrawal(login string) ([]model.Withdrawn, error) {
 		// 	sum         float64
 		// 	processedat time.Time
 		// )
+		var result2 model.Withdrawn
 		err = rows.Scan(&result2.Order, &result2.Sum, &result2.ProcessedAt)
 		if err != nil {
 			e := errormart.NewMartError(err)
