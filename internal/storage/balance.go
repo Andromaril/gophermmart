@@ -1,6 +1,7 @@
 package storagedb
 
 import (
+	"database/sql"
 	"fmt"
 
 	"github.com/andromaril/gophermmart/internal/errormart"
@@ -9,21 +10,22 @@ import (
 
 func (m *Storage) GetBalance(login string) (model.Balance, error) {
 	result := model.Balance{}
-	// var current sql.NullFloat64
-	// var withdrawn sql.NullFloat64
-	rows, err := m.DB.QueryContext(m.Ctx, "SELECT current, withdrawn FROM balances WHERE login=$1", login)
+	var current sql.NullFloat64
+	var withdrawn sql.NullFloat64
+	rows := m.DB.QueryRowContext(m.Ctx, "SELECT current, withdrawn FROM balances WHERE login=$1", login)
 	// if err != nil {
 	// 	e := errormart.NewMartError(err)
 	// 	return model.Balance{}, fmt.Errorf("error select %q", e.Error())
 	// }
 
-	defer rows.Close()
-	rows.Next()
-	err = rows.Scan(&result.Current, &result.Withdrawn)
+	//defer rows.Close()
+	//rows.Next()
+	err := rows.Scan(current, withdrawn)
 	if err != nil {
 		e := errormart.NewMartError(err)
 		return model.Balance{}, fmt.Errorf("error select %q", e.Error())
 	}
+	result = model.Balance{current.Float64, withdrawn.Float64}
 	//}
 	// err = rows.Err()
 	// if err != nil {
