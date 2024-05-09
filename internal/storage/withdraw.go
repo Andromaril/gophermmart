@@ -20,11 +20,6 @@ func (m *Storage) GetWithdrawal(login string) ([]model.Withdrawn, error) {
 
 	defer rows.Close()
 	for rows.Next() {
-		// var (
-		// 	order       string
-		// 	sum         float64
-		// 	processedat time.Time
-		// )
 		var result2 model.Withdrawn
 		err = rows.Scan(&result2.Order, &result2.Sum, &result2.ProcessedAt)
 		if err != nil {

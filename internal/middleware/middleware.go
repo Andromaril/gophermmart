@@ -9,14 +9,13 @@ import (
 func AuthMiddleware(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ow := w
-		var err error
 		cookie, err := r.Cookie("Token")
-		_, err = r.Cookie("Login")
+		_, err2 := r.Cookie("Login")
 		if err != nil {
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
-		if err != nil {
+		if err2 != nil {
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}

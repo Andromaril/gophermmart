@@ -11,7 +11,6 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-
 func (m *Storage) NewOrder(login string, order string) error {
 	_, err := m.DB.ExecContext(m.Ctx, `
 	INSERT INTO orders (login, number, status, uploadedat)
@@ -66,18 +65,13 @@ func (m *Storage) GetAllOrders(login string) ([]model.Order, error) {
 	}
 	defer rows.Close()
 	for rows.Next() {
-		var (
-			number     string
-			status     string
-			accrual    *float64
-			uploadedat time.Time
-		)
-		err = rows.Scan(&number, &status, &accrual, &uploadedat)
+		var result2 model.Order
+		err = rows.Scan(&result2.Number, &result2.Status, &result2.Accrual, &result2.UploadedAt)
 		if err != nil {
 			e := errormart.NewMartError(err)
 			return result, fmt.Errorf("invalid scan %q", e.Error())
 		}
-		result = append(result, model.Order{Number: number, Status: status, Accrual: accrual, UploadedAt: uploadedat})
+		result = append(result, model.Order{Number: result2.Number, Status: result2.Status, Accrual: result2.Accrual, UploadedAt: result2.UploadedAt})
 	}
 	SortOrdersTime(result)
 	err = rows.Err()
@@ -98,18 +92,13 @@ func (m *Storage) GetAccrualOrders() ([]model.Order, error) {
 
 	defer rows.Close()
 	for rows.Next() {
-		var (
-			number     string
-			status     string
-			accrual    *float64
-			uploadedat time.Time
-		)
-		err = rows.Scan(&number, &status, &accrual, &uploadedat)
+		var result2 model.Order
+		err = rows.Scan(&result2.Number, &result2.Status, &result2.Accrual, &result2.UploadedAt)
 		if err != nil {
 			e := errormart.NewMartError(err)
 			return result, fmt.Errorf("invalid scan %q", e.Error())
 		}
-		result = append(result, model.Order{Number: number, Status: status, Accrual: accrual, UploadedAt: uploadedat})
+		result = append(result, model.Order{Number: result2.Number, Status: result2.Status, Accrual: result2.Accrual, UploadedAt: result2.UploadedAt})
 	}
 	err = rows.Err()
 	if err != nil {
