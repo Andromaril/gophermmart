@@ -9,15 +9,15 @@ import (
 
 func (m *Storage) GetBalance(login string) (model.Balance, error) {
 	result := model.Balance{}
-	rows, err := m.DB.QueryContext(m.Ctx, "SELECT current, withdrawn FROM balances WHERE login=$1", login)
-	if err != nil {
-		e := errormart.NewMartError(err)
-		return model.Balance{}, fmt.Errorf("error select %q", e.Error())
-	}
+	rows := m.DB.QueryRowContext(m.Ctx, "SELECT current, withdrawn FROM balances WHERE login=$1", login)
+	// if err != nil {
+	// 	e := errormart.NewMartError(err)
+	// 	return model.Balance{}, fmt.Errorf("error select %q", e.Error())
+	// }
 
 	//defer rows.Close()
 	//for rows.Next() {
-	err = rows.Scan(&result.Current, &result.Withdrawn)
+	err := rows.Scan(&result.Current, &result.Withdrawn)
 	if err != nil {
 		e := errormart.NewMartError(err)
 		return model.Balance{}, fmt.Errorf("error select %q", e.Error())
