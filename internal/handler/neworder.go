@@ -50,6 +50,7 @@ func NewOrder(m storagedb.Storage) http.HandlerFunc {
 			}
 		} else {
 			res.WriteHeader(http.StatusUnprocessableEntity)
+			return
 		}
 		res.WriteHeader(http.StatusAccepted)
 	}
