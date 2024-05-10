@@ -1,10 +1,16 @@
 package main
 
-import "net/http"
+import (
+	_ "github.com/jackc/pgx/v5/stdlib"
+
+	"github.com/andromaril/gophermmart/internal/flag"
+	"github.com/andromaril/gophermmart/internal/start"
+)
 
 func main() {
-	err := http.ListenAndServe(`:8080`, nil)
-	if err != nil {
-		panic(err)
-	}
+	flag.ParseFlags()
+	db, newdb := start.Start()
+	defer db.Close()
+	go start.Update(&newdb)
+	start.NewRouter(newdb)
 }
